@@ -26,7 +26,7 @@ namespace viewer {
 			Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
 
 			// Fenstergröße setzen
-			this.set_size_request (1000, 600);
+			this.set_default_size (1000, 600);
 
 			// Fensterposition setzen
 			this.window_position = Gtk.WindowPosition.CENTER;
