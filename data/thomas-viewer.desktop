@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=THOMAS-Viewer
+Comment=Zeigt die Telemetrie von THOMAS an
+GenericName=thomas-viewer
+Exec=thomas-viewer %U
+Icon=thomas-viewer
+Terminal=false
+Categories=Network;
