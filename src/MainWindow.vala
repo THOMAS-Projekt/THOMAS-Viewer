@@ -4,6 +4,9 @@ namespace viewer {
 		// Anwendung
 		private viewerApp app;
 
+		// Headerbar
+		private Gtk.HeaderBar header_bar;
+
 		// Stack
 		private Gtk.Stack stack;
 
@@ -25,8 +28,20 @@ namespace viewer {
 			// Fensterposition setzen
 			this.window_position = Gtk.WindowPosition.CENTER;
 
+			// Headerbar erstellen
+			header_bar = new Gtk.HeaderBar ();
+
 			// Fenstertitel setzen
-			this.title = "THOMAS-Viewer";
+			header_bar.title = "THOMAS-Viewer";
+
+			// Schließen-Button anzeigen
+			header_bar.show_close_button = true;
+
+			// "header-bar"-Klasse vom Objekt entfernen
+			header_bar.get_style_context ().remove_class ("header-bar");
+
+			// Headerbar als Titelleiste setzen
+			this.set_titlebar (header_bar);
 
 			// Stack erstellen
 			stack = new Gtk.Stack ();
