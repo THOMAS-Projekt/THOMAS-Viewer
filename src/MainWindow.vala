@@ -2,7 +2,13 @@ namespace viewer {
 	// Hauptfenster
 	public class MainWindow : Gtk.Window {
 		// Anwendung
-		public viewerApp app;
+		private viewerApp app;
+
+		// Stack
+		private Gtk.Stack stack;
+
+		// Willkommensbildschirm
+		private Granite.Widgets.Welcome welcome;
 
 		// Instanzierung
 		public MainWindow (viewerApp app) {
@@ -16,13 +22,27 @@ namespace viewer {
 			// Fenstergröße setzen
 			this.set_size_request (1000, 600);
 
-			// Resize-Grip verstecken
-			this.has_resize_grip = false;
-
 			// Fensterposition setzen
 			this.window_position = Gtk.WindowPosition.CENTER;
 
-this.add (new Gtk.Label ("TODO"));
+			// Fenstertitel setzen
+			this.title = "THOMAS-Viewer";
+
+			// Stack erstellen
+			stack = new Gtk.Stack ();
+
+			// Willkommensbildschirm erstellen
+			welcome = new Granite.Widgets.Welcome ("Nicht verbunden", "Bitte wähle eine Adresse");
+
+			// Buttons zum Willkommensbildschirm hinzufügen
+			welcome.append ("edit", "Adresse eingeben", "Eine neue Adresse eingeben");
+			welcome.append ("media-playback-start", "Verbindung wiederherstellen", "Mit der zuletzt verwendeten Adresse verbinden");
+
+			// Willkommensbildschirm zum Stack hinzufügen
+			stack.add_named (welcome, "welcome");
+
+			// Stack zum Fenster hinzufügen
+			this.add (stack);
 
 			// Alles anzeigen
 			this.show_all ();
