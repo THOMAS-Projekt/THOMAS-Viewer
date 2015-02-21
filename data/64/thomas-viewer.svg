@@ -15,7 +15,7 @@
    height="64"
    id="svg4161"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="utilities-terminal.svg">
+   sodipodi:docname="thomas-viewer.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -28,14 +28,18 @@
      inkscape:window-width="1366"
      inkscape:window-height="713"
      id="namedview45"
-     showgrid="false"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="36.981034"
-     inkscape:cy="32.025541"
+     showgrid="true"
+     inkscape:zoom="7.9999999"
+     inkscape:cx="39.477442"
+     inkscape:cy="25.671134"
      inkscape:window-x="0"
      inkscape:window-y="30"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg4161" />
+     inkscape:current-layer="svg4161">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3033" />
+  </sodipodi:namedview>
   <defs
      id="defs4163">
     <linearGradient
@@ -227,7 +231,7 @@
        x2="33.411091"
        y1="24.999996"
        x1="14.588936"
-       gradientTransform="matrix(1.5020386,0,0,1.5020386,-4.0489505,-5.5509585)"
+       gradientTransform="matrix(1.5245054,0,0,1.5245055,-3.7871685,-6.4290468)"
        gradientUnits="userSpaceOnUse"
        id="linearGradient3954"
        xlink:href="#linearGradient3680-6-6-6-3-7"
@@ -272,7 +276,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -331,29 +335,31 @@
      height="55"
      width="55" />
   <text
+     transform="scale(0.97546131,1.025156)"
      sodipodi:linespacing="125%"
-     id="text3833"
-     y="52.719696"
-     x="18.814259"
-     style="font-size:52.44586945px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.4;fill:#000000;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold"
+     id="text3035"
+     y="52.634205"
+     x="19.438416"
+     style="font-size:53.23033142px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.4;fill:#000000;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold"
      xml:space="preserve"><tspan
        style="fill:#000000;fill-opacity:1"
        rotate="0 0"
-       y="52.719696"
-       x="18.814259"
-       id="tspan3835"
+       y="52.634205"
+       x="19.438416"
+       id="tspan3037"
        sodipodi:role="line">T</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:52.44586945px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient3954);fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold"
-     x="16.814259"
-     y="50.719696"
+     style="font-size:53.23033142px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient3954);fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold"
+     x="17.388103"
+     y="50.683281"
      id="text3043"
-     sodipodi:linespacing="125%"><tspan
+     sodipodi:linespacing="125%"
+     transform="scale(0.97546134,1.025156)"><tspan
        sodipodi:role="line"
        id="tspan3045"
-       x="16.814259"
-       y="50.719696"
+       x="17.388103"
+       y="50.683281"
        rotate="0 0"
        style="fill:url(#linearGradient3954);fill-opacity:1">T</tspan></text>
 </svg>

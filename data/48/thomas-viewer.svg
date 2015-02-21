@@ -15,7 +15,7 @@
    height="48"
    id="svg4296"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="utilities-terminal.svg">
+   sodipodi:docname="thomas-viewer.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -28,14 +28,18 @@
      inkscape:window-width="1366"
      inkscape:window-height="713"
      id="namedview66"
-     showgrid="false"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="31.849113"
-     inkscape:cy="15.584547"
+     showgrid="true"
+     inkscape:zoom="7.9999999"
+     inkscape:cx="34.246417"
+     inkscape:cy="20.310168"
      inkscape:window-x="0"
      inkscape:window-y="30"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg4296" />
+     inkscape:current-layer="svg4296">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3045" />
+  </sodipodi:namedview>
   <defs
      id="defs4298">
     <linearGradient
@@ -322,7 +326,7 @@
        x2="33.411091"
        y2="24.999996"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.1418428,0,0,1.1418428,-3.4042331,-3.5460715)" />
+       gradientTransform="matrix(1.1456561,0,0,1.1456562,-3.9676073,-3.1370024)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3680-6-6-6-3-7"
@@ -333,6 +337,16 @@
        x2="33.411091"
        y2="24.999996"
        gradientTransform="matrix(1.0498227,0,0,1.0498227,-1.1612661,-1.1999073)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3680-6-6-6-3-7"
+       id="linearGradient3819"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.1456561,0,0,1.1456562,-2.0072471,-1.0965609)"
+       x1="14.588936"
+       y1="24.999996"
+       x2="33.411091"
+       y2="24.999996" />
   </defs>
   <metadata
      id="metadata4301">
@@ -342,7 +356,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -401,29 +415,31 @@
      id="rect6741"
      style="opacity:0.3;fill:none;stroke:url(#linearGradient3024);stroke-width:0.99999994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
   <text
+     transform="scale(1.0202207,0.98018007)"
      sodipodi:linespacing="125%"
-     id="text3881"
-     y="41.230618"
-     x="14.455881"
-     style="font-size:39.86910628999999773px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.4;fill:#000000;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold"
+     id="text3047"
+     y="41.82299"
+     x="13.905834"
+     style="font-size:40.00225830000000116px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold;opacity:0.4"
      xml:space="preserve"><tspan
        style="fill:#000000;fill-opacity:1"
        rotate="0 0"
-       y="41.230618"
-       x="14.455881"
-       id="tspan3883"
+       y="41.82299"
+       x="13.905834"
+       id="tspan3049"
        sodipodi:role="line">T</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:39.86910629px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient3821);fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold"
-     x="12.455881"
-     y="39.230618"
+     style="font-size:40.0022583px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient3821);fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans Bold"
+     x="11.945474"
+     y="39.782551"
      id="text3043"
-     sodipodi:linespacing="125%"><tspan
+     sodipodi:linespacing="125%"
+     transform="scale(1.0202207,0.98018005)"><tspan
        sodipodi:role="line"
        id="tspan3045"
-       x="12.455881"
-       y="39.230618"
+       x="11.945474"
+       y="39.782551"
        rotate="0 0"
        style="fill:url(#linearGradient3821);fill-opacity:1">T</tspan></text>
 </svg>
