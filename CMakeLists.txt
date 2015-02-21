@@ -37,6 +37,7 @@ vala_precompile(VALA_C
 	src/viewer.vala
 	src/MainWindow.vala
 	src/SettingsManager.vala
+	src/Widgets/TelemetryView.vala
 PACKAGES
 	gtk+-3.0
 	gio-2.0

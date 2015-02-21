@@ -13,6 +13,9 @@ namespace viewer {
 		// Willkommensbildschirm
 		private Granite.Widgets.Welcome welcome;
 
+		// Telemetrie-Seite
+		private Widgets.TelemetryView telemetry_view;
+
 		// Instanzierung
 		public MainWindow (viewerApp app) {
 			// Anwendung setzen
@@ -53,8 +56,25 @@ namespace viewer {
 			welcome.append ("edit", "Adresse eingeben", "Eine neue Adresse eingeben");
 			welcome.append ("media-playback-start", "Verbindung wiederherstellen", "Mit der zuletzt verwendeten Adresse verbinden");
 
+			// Click-Ereignis des Willkommensbildschirmes setzen
+			welcome.activated.connect ((index) => {
+				// Welcher Button wurde gedrückt?
+				if (index == 0) {
+					// Adresse eingeben => TODO: Eingabe-Dialog anzeigen
+
+					// Telemetrie-Seite anzeigen
+					stack.set_visible_child_full ("telemetry", Gtk.StackTransitionType.SLIDE_LEFT);
+				}
+			});
+
 			// Willkommensbildschirm zum Stack hinzufügen
 			stack.add_named (welcome, "welcome");
+
+			// Telemetrie-Seite erstellen
+			telemetry_view = new Widgets.TelemetryView ();
+
+			// Telemetrie-Seite zum Stack hinzufügen
+			stack.add_named (telemetry_view, "telemetry");
 
 			// Stack zum Fenster hinzufügen
 			this.add (stack);
