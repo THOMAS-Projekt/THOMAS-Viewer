@@ -21,7 +21,7 @@ namespace viewer.Widgets {
 			// Anfrage die Verbindung zu beenden
 			camera_stream.disconnect_requested.connect (() => {
 				// Verbindung beenden
-				disconnect ();
+				tcp_disconnect ();
 			});
 
 			// Kamera-Stream auf der linken Seite anzeigen
@@ -44,7 +44,7 @@ namespace viewer.Widgets {
 		}
 
 		// Verbindung beenden
-		private void disconnect () {
+		private void tcp_disconnect () {
 			// TODO: Verbindung beenden
 
 			// Verbindung beendet

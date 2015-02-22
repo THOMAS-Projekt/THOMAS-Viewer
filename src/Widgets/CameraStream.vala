@@ -38,6 +38,9 @@ image.pixbuf = pixbuf;
 				disconnect_requested ();
 			});
 
+// Beispielstatus
+control_bar.set_status ("640x460 -- 30% JPEG -- 27 FPS");
+
 			// Steuerungsleiste anzeigen
 			this.add_overlay (control_bar);
 
