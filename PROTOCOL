@@ -1,0 +1,18 @@
+-- THOMAS-TELEMETRIE-PROTOKOLL --
+Dieses Datenübertragungsprotokoll definiert die Kommunikation zwischen dem Telemetrie-Server [S] und dem Anzeige-Programm [C].
+
+
+~ Kommunikation:
+
+=> [C] Anfrage zum Beginn der Übertragung
+=> 1. [BYTE]: = 1, Kommandobyte.
+=> 2. [uint16]: Port des UDP-Servers.
+
+=> [C] Anfrage eines Status-Feldes
+=> 1. [BYTE]: = 2, Kommandobyte.
+=> 2. [BYTE]: ID des Feldes.
+
+=> [S] Senden eines Status-Feldes
+=> 1. [BYTE]: = 1, Kommandobyte.
+=> 2. [BYTE]: ID des Feldes.
+=> 3. [string]: Wert (Endet mit \n).
