@@ -71,7 +71,7 @@ add_entry ("Hinten Rechts", "23 cm");
 
 			// Abstände definieren
 			field_label.margin_start = 24;
-			data_label.margin_end = 12;
+			data_label.margin_end = 24;
 
 			// Labels zur Liste hinzufügen
 			this.attach (field_label, 0, rows, 1, 1);

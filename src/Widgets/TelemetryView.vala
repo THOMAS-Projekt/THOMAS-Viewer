@@ -40,7 +40,7 @@ namespace viewer.Widgets {
 			scrolled.add (sensor_data);
 
 			// Scrollbaren Bereich auf der rechten Seite anzeigen
-			this.pack2 (scrolled, true, false);
+			this.pack2 (scrolled, false, false);
 		}
 
 		// Verbindung beenden
