@@ -4,6 +4,9 @@ namespace viewer {
 		// Anwendung
 		private viewerApp app;
 
+		// Vollbildmodus aktiv?
+		private bool fullscreened = false;
+
 		// Headerbar
 		private Gtk.HeaderBar header_bar;
 
@@ -30,6 +33,43 @@ namespace viewer {
 
 			// Fensterposition setzen
 			this.window_position = Gtk.WindowPosition.CENTER;
+
+			// Tastendruck
+			this.key_press_event.connect ((event) => {
+				// Taste analysieren
+				switch (event.keyval) {
+					// F11
+					case Gdk.Key.F11:
+						// Bereits im Vollbildmodus?
+						if (!fullscreened) {
+							// Nein => Vollbildmodus starten
+							this.fullscreen ();
+							fullscreened = true;
+						} else {
+							// Ja => Vollbildmodus beenden
+							this.unfullscreen ();
+							fullscreened = false;
+						}
+
+						// Fertig!
+						break;
+
+					// Escape
+					case Gdk.Key.Escape:
+						// Vollbildmodus aktiv?
+						if (fullscreened) {
+							// Ja => Vollbildmodus beenden
+							this.unfullscreen ();
+							fullscreened = false;
+						}
+
+						// Fertig!
+						break;
+				}
+
+				// Fertig!
+				return true;
+			});
 
 			// Headerbar erstellen
 			header_bar = new Gtk.HeaderBar ();
