@@ -7,6 +7,24 @@ namespace viewer.Widgets {
 		// Steuerungsleiste
 		private ControlBar control_bar;
 
+		// UDP-Socket
+		private Socket socket;
+
+		// Datenquelle
+		private SocketSource socket_source;
+
+		// Cancel-Objekt
+		private Cancellable cancellable;
+
+		// Main-Loop
+		private MainLoop main_loop;
+
+		// Anzahl der in dieser Sekunde empfangenen Frames
+		private int frames_per_second = 0;
+
+		// Gibt an ob der UDP-Socket läuft
+		private bool udp_running = false;
+
 		// Verbindung beenden
 		public signal void disconnect_requested ();
 
@@ -17,14 +35,6 @@ namespace viewer.Widgets {
 
 			// Kamerabild erstellen
 			image = new Gtk.Image ();
-
-/*
-// Experiment! Dies muss später zusammen mit einem korrekten Error-Handling implementiert werden.
-var file = File.new_for_path ("/home/marcus/THOMAS-Projekt/test.jpeg");
-var input = file.read ();
-var pixbuf = new Gdk.Pixbuf.from_stream (input);
-image.pixbuf = pixbuf;
-*/
 
 			// Kamerabild anzeigen
 			this.add_overlay (image);
@@ -37,9 +47,6 @@ image.pixbuf = pixbuf;
 				// Verbindung beenden
 				disconnect_requested ();
 			});
-
-// Beispielstatus
-control_bar.set_status ("640x460 -- 30% JPEG -- 27 FPS");
 
 			// Steuerungsleiste anzeigen
 			this.add_overlay (control_bar);
@@ -66,6 +73,128 @@ control_bar.set_status ("640x460 -- 30% JPEG -- 27 FPS");
 				// Fertig!
 				return false;
 			});
+		}
+
+		// Socket erstellen
+		public void run_socket (uint16 port) {
+			// Fehler abfangen
+			try {
+				// Statusmeldung
+				control_bar.set_status ("UDP-Socket wird erstellt...");
+
+				// Cancel-Objekt erstellen
+				cancellable = new Cancellable ();
+
+				// UDP-Socket erstellen
+				socket = new Socket (SocketFamily.IPV4, SocketType.DATAGRAM, SocketProtocol.UDP);
+
+				// Port festlegen
+				socket.bind (new InetSocketAddress (new InetAddress.loopback (SocketFamily.IPV4), port), true);
+
+				// Datenquelle erstellen
+				socket_source = socket.create_source (IOCondition.IN, cancellable);
+
+				// Empfangsfunktion festlegen
+				socket_source.set_callback ((socket, condition) => {
+					// Fehler abfangen
+					try {
+						// Puffer erstellen (100kb)
+						uint8 buffer[102400];
+
+						// Empfangene Daten in den Puffer schreiben
+						socket.receive (buffer);
+
+						// Frame anzeigen
+						show_frame_from_data (buffer);
+
+						// FPS hochzählen
+						frames_per_second++;
+					} catch (Error e) {
+						// Fehler
+						control_bar.set_status (e.message);
+					}
+
+					// Datenquelle nicht löschen
+					return true;
+				});
+
+				// Mit der Hauptschleife verknüpfen
+				socket_source.attach (MainContext.default ());
+
+				// TODO: Befehl zum Starten der Übertragung senden und dem Server den Port mitteilen
+
+				// Socket gestartet
+				udp_running = true;
+
+				// FPS-Timer erstellen
+				Timeout.add (1000, () => {
+					// Nur um sicher zu gehen...
+					if (image.pixbuf != null) {
+						// Bild vorhanden => Status aktualisieren
+						control_bar.set_status ("%dx%d -- %d FPS".printf (image.pixbuf.width, image.pixbuf.height, frames_per_second));
+
+						// FPS zurücksetzen
+						frames_per_second = 0;
+					}
+
+					// Timer weiterlaufen lassen solange der Socket läuft
+					return udp_running;
+				});
+
+				// Statusmeldung
+				control_bar.set_status ("Warte auf Übertragung...");
+
+				// Hauptschleife erstellen
+				main_loop = new MainLoop ();
+
+				// Hauptschleife starten
+				main_loop.run ();
+			} catch (Error e) {
+				// Fehler
+				control_bar.set_status (e.message);
+			}
+		}
+
+		// Socket stoppen
+		public void stop_socket () {
+			// UDP-Socket beendet
+			udp_running = false;
+
+			// Cancel
+			cancellable.cancel ();
+
+			// Verknüpfung zur Hauptschleife auflösen (Sonst wird die Schleife nicht beendet.)
+			socket_source.destroy ();
+
+			// Hauptschleife beenden
+			main_loop.quit ();
+
+			// Statusmeldung
+			control_bar.set_status ("UDP-Socket gestoppt.");
+		}
+
+		// Frame-Daten als Bild darstellen
+		private void show_frame_from_data (uint8[] data) {
+			// Fehler abfangen
+			try {
+				// Jpeg-Decoder erstellen
+				var loader = new Gdk.PixbufLoader ();
+
+				// Daten übergeben
+				loader.write (data);
+
+				// Daten vollständig
+				loader.close ();
+
+				// Bild abrufen
+				var pixbuf = loader.get_pixbuf ();
+
+				// Bild anzeigen
+				image.pixbuf = pixbuf;
+			} catch (Error e) {
+				// Fehler
+				control_bar.set_status (e.message);
+			}
 		}
 	}
 }

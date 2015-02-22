@@ -105,8 +105,13 @@ namespace viewer {
 				if (index == 0) {
 					// Adresse eingeben => TODO: Eingabe-Dialog anzeigen
 
+					// TODO: Versuchen die Verbindung herzustellen
+
 					// Telemetrie-Seite anzeigen
 					stack.set_visible_child_full ("telemetry", Gtk.StackTransitionType.SLIDE_LEFT);
+
+					// Kamera-Stream-Empfänger starten
+					telemetry_view.run_stream_receiver (4222);
 				}
 			});
 

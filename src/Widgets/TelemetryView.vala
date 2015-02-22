@@ -41,14 +41,29 @@ namespace viewer.Widgets {
 
 			// Scrollbaren Bereich auf der rechten Seite anzeigen
 			this.pack2 (scrolled, false, false);
+
+			// Objekt wird zerstört
+			this.destroy.connect (() => {
+				// Verbindung beenden
+				tcp_disconnect ();
+			});
 		}
 
 		// Verbindung beenden
 		private void tcp_disconnect () {
 			// TODO: Verbindung beenden
 
+			// UDP-Socket beenden
+			camera_stream.stop_socket ();
+
 			// Verbindung beendet
 			connection_closed ();
+		}
+
+		// Socket starten
+		public void run_stream_receiver (uint16 port) {
+			// UDP-Socket erstellen
+			camera_stream.run_socket (port);
 		}
 	}
 }
