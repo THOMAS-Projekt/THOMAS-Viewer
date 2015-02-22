@@ -6,6 +6,9 @@ namespace viewer.Widgets {
 
 		// Instanzierung
 		public CameraStream () {
+			// Mindestbreite setzen
+			this.set_size_request (400, -1);
+
 			// Kamerabild erstellen
 			image = new Gtk.Image ();
 

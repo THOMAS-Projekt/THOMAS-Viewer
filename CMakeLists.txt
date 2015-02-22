@@ -39,6 +39,7 @@ vala_precompile(VALA_C
 	src/SettingsManager.vala
 	src/Widgets/TelemetryView.vala
 	src/Widgets/CameraStream.vala
+	src/Widgets/SensorData.vala
 PACKAGES
 	gtk+-3.0
 	gio-2.0
