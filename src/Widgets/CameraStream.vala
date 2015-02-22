@@ -4,6 +4,9 @@ namespace viewer.Widgets {
 		// Kamerabild
 		private Gtk.Image image;
 
+		// Steuerungsleiste
+		private ControlBar control_bar;
+
 		// Instanzierung
 		public CameraStream () {
 			// Mindestbreite setzen
@@ -22,6 +25,12 @@ namespace viewer.Widgets {
 
 			// Kamerabild anzeigen
 			this.add_overlay (image);
+
+			// Steuerungsleiste erstellen
+			control_bar = new ControlBar ();
+
+			// Steuerungsleiste anzeigen
+			this.add_overlay (control_bar);
 		}
 	}
 }
