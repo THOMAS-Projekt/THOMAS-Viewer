@@ -49,6 +49,9 @@ namespace viewer {
 			// Stack erstellen
 			stack = new Gtk.Stack ();
 
+			// Animationsgeschwindigkeit setzen
+			stack.transition_duration = 400;
+
 			// Willkommensbildschirm erstellen
 			welcome = new Granite.Widgets.Welcome ("Nicht verbunden", "Bitte wähle eine Adresse");
 
@@ -72,6 +75,12 @@ namespace viewer {
 
 			// Telemetrie-Seite erstellen
 			telemetry_view = new Widgets.TelemetryView ();
+
+			// Verbindung wurde beendet
+			telemetry_view.connection_closed.connect (() => {
+				// Zurück zur Startseite
+				stack.set_visible_child_full ("welcome", Gtk.StackTransitionType.SLIDE_RIGHT);
+			});
 
 			// Telemetrie-Seite zum Stack hinzufügen
 			stack.add_named (telemetry_view, "telemetry");

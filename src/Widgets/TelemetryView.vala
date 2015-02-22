@@ -10,10 +10,19 @@ namespace viewer.Widgets {
 		// Sensordaten-Anzeige
 		private SensorData sensor_data;
 
+		// Verbindung beendet
+		public signal void connection_closed ();
+
 		// Instanzierung
 		public TelemetryView () {
 			// Kamera-Stream erstellen
 			camera_stream = new CameraStream ();
+
+			// Anfrage die Verbindung zu beenden
+			camera_stream.disconnect_requested.connect (() => {
+				// Verbindung beenden
+				disconnect ();
+			});
 
 			// Kamera-Stream auf der linken Seite anzeigen
 			this.pack1 (camera_stream, true, false);
@@ -32,6 +41,14 @@ namespace viewer.Widgets {
 
 			// Scrollbaren Bereich auf der rechten Seite anzeigen
 			this.pack2 (scrolled, true, false);
+		}
+
+		// Verbindung beenden
+		private void disconnect () {
+			// TODO: Verbindung beenden
+
+			// Verbindung beendet
+			connection_closed ();
 		}
 	}
 }

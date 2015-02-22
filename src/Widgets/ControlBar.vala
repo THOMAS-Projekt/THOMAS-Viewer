@@ -7,16 +7,11 @@ namespace viewer.Widgets {
 		// Zurück-Button
 		private Gtk.Button back_button;
 
-		// Gibt an ob sich die Maus über dem Objekt befindet
-		private bool hovered = false;
+		// Verbindung beenden
+		public signal void disconnect_requested ();
 
 		// Instanzierung
 		public ControlBar () {
-			// Zu überwachende Ereignisse festlegen
-			this.events |= Gdk.EventMask.POINTER_MOTION_MASK;
-			this.events |= Gdk.EventMask.LEAVE_NOTIFY_MASK;
-			this.events |= Gdk.EventMask.ENTER_NOTIFY_MASK;
-
 			// Animation setzen
 			this.transition_type = Gtk.RevealerTransitionType.CROSSFADE;
 
@@ -35,40 +30,17 @@ namespace viewer.Widgets {
 			// Zurück-Button erstellen
 			back_button = new Gtk.Button.from_icon_name ("go-previous-symbolic", Gtk.IconSize.BUTTON);
 
+			// Click-Ereignis setzen
+			back_button.clicked.connect (() => {
+				// Verbindung beenden
+				disconnect_requested ();
+			});
+
 			// Zurück-Button zur Leiste hinzufügen
 			actions.pack_start (back_button);
 
 			// Aktionsleiste hinzufügen
 			this.add (actions);
-
-			// Die Maus wird auf das Objekt bewegt
-			this.enter_notify_event.connect ((event) => {
-				// Die Maus ist über dem Objekt
-				hovered = true;
-
-				// Fertig!
-				return false;
-			});
-
-			// Die Maus verlässt das Objekt
-			this.leave_notify_event.connect ((event) => {
-				// Die Maus hat das Objekt verlassen
-				hovered = false;
-
-				// Fertig!
-				return false;
-			});
-
-this.set_reveal_child(true);
-
-			// Die hovered-Variable wird geändert
-			notify["hovered"].connect (() => {
-				if (hovered) {
-					print ("drüber\n");
-				} else {
-					print ("nope\n");
-				}
-			});
 		}
 	}
 }
