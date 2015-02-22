@@ -10,6 +10,9 @@ namespace viewer.Widgets {
 		// Status-Label
 		private Gtk.Label status_label;
 
+		// Info-Button
+		private Gtk.Button about_button;
+
 		// Verbindung beenden
 		public signal void disconnect_requested ();
 
@@ -47,6 +50,39 @@ namespace viewer.Widgets {
 
 			// Status-Label zur Leiste hinzufügen
 			actions.set_center_widget (status_label);
+
+			// Info-Button erstellen
+			about_button = new Gtk.Button.from_icon_name ("help-info-symbolic", Gtk.IconSize.BUTTON);
+
+			// Click-Ereignis setzen
+			about_button.clicked.connect (() => {
+				// Info-Dialog erstellen
+				var dialog = new Granite.GtkPatch.AboutDialog ();
+
+				// Eigenschaften setzen
+				dialog.artists = {"Marcus Wichelmann <admin@marcusw.de>"};
+				dialog.authors = {"Marcus Wichelmann <admin@marcusw.de>"};
+				dialog.comments = "Zeigt die Telemetrie von THOMAS an.";
+				dialog.copyright = "2015 THOMAS-Projekt";
+				dialog.documenters = {"Marcus Wichelmann <admin@marcusw.de>"};
+				dialog.logo_icon_name = "thomas-viewer";
+				dialog.program_name = "THOMAS-Viewer";
+				dialog.version = "0.1";
+				dialog.website = "http://thomas-projekt.de";
+				dialog.website_label = "Thomas-Projekt.de";
+
+				// Schließen-Button gedrückt
+				dialog.response.connect (() => {
+					// Dialog schließen
+					dialog.destroy ();
+				});
+
+				// Info-Dialog anzeigen
+				dialog.show_all ();
+			});
+
+			// Info-Button zur Leiste hinzufügen
+			actions.pack_end (about_button);
 
 			// Aktionsleiste hinzufügen
 			this.add (actions);

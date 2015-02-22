@@ -26,9 +26,9 @@ namespace viewer {
 			bug_url = "https://github.com/THOMAS-Projekt/THOMAS-Viewer/issues";
 			help_url = "https://github.com/THOMAS-Projekt/THOMAS-Viewer/wiki";
 			translate_url = "https://github.com/THOMAS-Projekt/THOMAS-Viewer";
-			about_authors = { "Marcus Wichelmann <admin@marcusw.de>" };
-			about_documenters = { "Marcus Wichelmann <admin@marcusw.de>" };
-			about_artists = { "Marcus Wichelmann <admin@marcusw.de>" };
+			about_authors = {"Marcus Wichelmann <admin@marcusw.de>"};
+			about_documenters = {"Marcus Wichelmann <admin@marcusw.de>"};
+			about_artists = {"Marcus Wichelmann <admin@marcusw.de>"};
 			about_comments = "Zeigt die Telemetrie von THOMAS an.";
 			about_translators = "";
 		}
