@@ -5,10 +5,10 @@ namespace viewer {
 		static const string SETTINGS_PATH = "org.thomas.viewer";
 
 		// Keys
-		// TODO
+		static const string AUTO_RESIZE_KEY = "auto-resize";
 
 		// Felder
-		// TODO
+		public bool auto_resize { get; set; default = true; }
 
 		// Ereignisse
 		// TODO
@@ -23,6 +23,9 @@ namespace viewer {
 		public SettingsManager () {
 			// Mit dem Settings-Manager verbinden
 			this.settings = new Settings (SETTINGS_PATH);
+
+			// Keys verknüpfen
+			this.settings.bind (AUTO_RESIZE_KEY, this, "auto-resize", SettingsBindFlags.DEFAULT);
 		}
 
 		// Instanz abrufen

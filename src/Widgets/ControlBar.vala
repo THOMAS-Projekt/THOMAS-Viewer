@@ -13,6 +13,12 @@ namespace viewer.Widgets {
 		// Info-Button
 		private Gtk.Button about_button;
 
+		// Einstellungs-Button
+		private Gtk.Button settings_button;
+
+		// Gibt an ob die Einstellungen gerade angezeigt werden
+		public bool settings_popover_active { get; private set; default = false; }
+
 		// Verbindung beenden
 		public signal void disconnect_requested ();
 
@@ -65,6 +71,36 @@ namespace viewer.Widgets {
 
 			// Info-Button zur Leiste hinzufügen
 			actions.pack_end (about_button);
+
+			// Einstellungs-Button erstellen
+			settings_button = new Gtk.Button.from_icon_name ("media-eq-symbolic", Gtk.IconSize.BUTTON);
+
+			// Click-Ereignis setzen
+			settings_button.clicked.connect (() => {
+				// Popover erstellen
+				var popover = new Gtk.Popover (settings_button);
+
+				// Popover wird geschlossen
+				popover.closed.connect (() => {
+					// Einstellungs-Popover wird nicht mehr angezeigt
+					settings_popover_active = false;
+				});
+
+				// Einstellungs-Popover wird angezeigt
+				settings_popover_active = true;
+
+				// Einstellungstabelle erstellen
+				var properties = new Properties ();
+
+				// Einstellungstabelle im Popover anzeigen
+				popover.add (properties);
+
+				// Popover anzeigen
+				popover.show_all ();
+			});
+
+			// Einstellungs-Button zur Leiste hinzufügen
+			actions.pack_end (settings_button);
 
 			// Aktionsleiste hinzufügen
 			this.add (actions);

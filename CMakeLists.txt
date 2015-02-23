@@ -40,6 +40,7 @@ vala_precompile(VALA_C
 	src/Widgets/TelemetryView.vala
 	src/Widgets/CameraStream.vala
 	src/Widgets/ControlBar.vala
+	src/Widgets/Properties.vala
 	src/Widgets/SensorData.vala
 PACKAGES
 	gtk+-3.0

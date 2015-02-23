@@ -80,7 +80,7 @@ namespace viewer.Widgets {
 			// Die Maus verlässt das Objekt
 			this.leave_notify_event.connect ((event) => {
 				// Steuerungsleiste verstecken
-				control_bar.set_reveal_child(false);
+				control_bar.set_reveal_child(control_bar.settings_popover_active);
 
 				// Fertig!
 				return false;
@@ -219,8 +219,28 @@ namespace viewer.Widgets {
 				// Bild abrufen
 				var pixbuf = loader.get_pixbuf ();
 
-				// Bild anzeigen
-				image.pixbuf = pixbuf;
+				// Bildgröße automatisch anpassen?
+				if (SettingsManager.get_default ().auto_resize) {
+					// Ja => An welcher Seite soll er sich orientieren?
+					if (((float)this.get_allocated_width () / pixbuf.width) * pixbuf.height > this.get_allocated_height ()) {
+						// An der Höhe Orientieren => Neue Breite berechnen
+						var new_width = (int)(((float)this.get_allocated_height () / pixbuf.height) * pixbuf.width);
+						var new_height = this.get_allocated_height ();
+
+						// Skaliertes Bild anzeigen
+						image.pixbuf = pixbuf.scale_simple (new_width, new_height, Gdk.InterpType.TILES);
+					} else {
+						// An der Breite Orientieren => Neue Höhe berechnen
+						var new_width = this.get_allocated_width ();
+						var new_height = (int)(((float)this.get_allocated_width () / pixbuf.width) * pixbuf.height);
+
+						// Skaliertes Bild anzeigen
+						image.pixbuf = pixbuf.scale_simple (new_width, new_height, Gdk.InterpType.TILES);
+					}
+				} else {
+					// Nein => Originalbild anzeigen
+					image.pixbuf = pixbuf;
+				}
 			} catch (Error e) {
 				// Fehler
 				control_bar.set_status (e.message);

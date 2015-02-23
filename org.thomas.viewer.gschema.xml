@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
 	<schema path="/org/thomas/viewer/" id="org.thomas.viewer" gettext-domain="viewer">
-		
+		<key type="b" name="auto-resize">
+			<default>true</default>
+			<summary>Das Kamerabild automatisch an die Fenstergröße anpassen</summary>
+		</key>
 	</schema>
 </schemalist>
