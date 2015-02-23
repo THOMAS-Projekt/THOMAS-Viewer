@@ -186,6 +186,9 @@ namespace viewer.Widgets {
 
 			// Statusmeldung
 			control_bar.set_status ("UDP-Socket gestoppt.");
+
+			// Aktuelles Bild löschen
+			image.pixbuf = null;
 		}
 
 		// Frame-Daten als Bild darstellen
