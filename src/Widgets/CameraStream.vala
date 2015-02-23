@@ -94,18 +94,24 @@ namespace viewer.Widgets {
 				// Datenquelle erstellen
 				socket_source = socket.create_source (IOCondition.IN, cancellable);
 
+				// Puffergröße festlegen
+				var buffer_size = 102400; // 100KB
+
 				// Empfangsfunktion festlegen
 				socket_source.set_callback ((socket, condition) => {
 					// Fehler abfangen
 					try {
-						// Puffer erstellen (100kb)
+						// Puffer erstellen
 						uint8 buffer[102400];
 
-						// Empfangene Daten in den Puffer schreiben
-						socket.receive (buffer);
-
-						// Frame anzeigen
-						show_frame_from_data (buffer);
+						// Empfangene Daten in den Puffer schreiben und Länge prüfen
+						if (socket.receive (buffer) >= buffer_size) {
+							// Puffer zu klein => Fehler
+							control_bar.set_status ("Die empfangenen Daten überschreiten die Puffergröße von %s.".printf (format_size (buffer_size)));
+						} else {
+							// Alles gut => Frame anzeigen
+							show_frame_from_data (buffer);
+						}
 
 						// FPS hochzählen
 						frames_per_second++;

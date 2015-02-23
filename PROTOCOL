@@ -12,6 +12,11 @@ Dieses Datenübertragungsprotokoll definiert die Kommunikation zwischen dem Tele
 => 1. [BYTE]: = 2, Kommandobyte.
 => 2. [BYTE]: ID des Feldes.
 
+=> [C] Setzen der Bildqualität
+=> 1. [BYTE]: = 3, Kommandobyte.
+=> 2. [BYTE]: Qualität in Prozent (0 -> Schlecht, 100 -> Gut)
+=> 3. [BYTE]: Größe in Prozent (0 -> Klein, 100 -> Groß)
+
 => [S] Senden eines Status-Feldes
 => 1. [BYTE]: = 1, Kommandobyte.
 => 2. [BYTE]: ID des Feldes.
