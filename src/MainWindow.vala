@@ -127,6 +127,12 @@ namespace viewer {
 				stack.set_visible_child_full ("welcome", Gtk.StackTransitionType.SLIDE_RIGHT);
 			});
 
+			// Der Info-Button wurde gedrückt
+			telemetry_view.about_button_clicked.connect (() => {
+				// Info-Dialog anzeigen
+				app.show_about (this);
+			});
+
 			// Telemetrie-Seite zum Stack hinzufügen
 			stack.add_named (telemetry_view, "telemetry");
 

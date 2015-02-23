@@ -16,6 +16,9 @@ namespace viewer.Widgets {
 		// Verbindung beenden
 		public signal void disconnect_requested ();
 
+		// Info-Button gedrückt.
+		public signal void about_button_clicked ();
+
 		// Instanzierung
 		public ControlBar () {
 			// Animation setzen
@@ -56,29 +59,8 @@ namespace viewer.Widgets {
 
 			// Click-Ereignis setzen
 			about_button.clicked.connect (() => {
-				// Info-Dialog erstellen
-				var dialog = new Granite.GtkPatch.AboutDialog ();
-
-				// Eigenschaften setzen
-				dialog.artists = {"Marcus Wichelmann <admin@marcusw.de>"};
-				dialog.authors = {"Marcus Wichelmann <admin@marcusw.de>"};
-				dialog.comments = "Zeigt die Telemetrie von THOMAS an.";
-				dialog.copyright = "2015 THOMAS-Projekt";
-				dialog.documenters = {"Marcus Wichelmann <admin@marcusw.de>"};
-				dialog.logo_icon_name = "thomas-viewer";
-				dialog.program_name = "THOMAS-Viewer";
-				dialog.version = "0.1";
-				dialog.website = "http://thomas-projekt.de";
-				dialog.website_label = "Thomas-Projekt.de";
-
-				// Schließen-Button gedrückt
-				dialog.response.connect (() => {
-					// Dialog schließen
-					dialog.destroy ();
-				});
-
 				// Info-Dialog anzeigen
-				dialog.show_all ();
+				about_button_clicked ();
 			});
 
 			// Info-Button zur Leiste hinzufügen

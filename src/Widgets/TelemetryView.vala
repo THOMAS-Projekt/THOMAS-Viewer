@@ -13,6 +13,9 @@ namespace viewer.Widgets {
 		// Verbindung beendet
 		public signal void connection_closed ();
 
+		// Info-Button gedrückt.
+		public signal void about_button_clicked ();
+
 		// Instanzierung
 		public TelemetryView () {
 			// Kamera-Stream erstellen
@@ -22,6 +25,12 @@ namespace viewer.Widgets {
 			camera_stream.disconnect_requested.connect (() => {
 				// Verbindung beenden
 				tcp_disconnect ();
+			});
+
+			// Der Info-Button wurde gedrückt
+			camera_stream.about_button_clicked.connect (() => {
+				// Info-Button gedrückt
+				about_button_clicked ();
 			});
 
 			// Kamera-Stream auf der linken Seite anzeigen

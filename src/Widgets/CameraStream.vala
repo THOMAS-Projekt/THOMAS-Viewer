@@ -28,6 +28,9 @@ namespace viewer.Widgets {
 		// Verbindung beenden
 		public signal void disconnect_requested ();
 
+		// Info-Button gedrückt.
+		public signal void about_button_clicked ();
+
 		// Instanzierung
 		public CameraStream () {
 			// Mindestbreite setzen
@@ -46,6 +49,12 @@ namespace viewer.Widgets {
 			control_bar.disconnect_requested.connect (() => {
 				// Verbindung beenden
 				disconnect_requested ();
+			});
+
+			// Der Info-Button wurde gedrückt
+			control_bar.about_button_clicked.connect (() => {
+				// Info-Button gedrückt
+				about_button_clicked ();
 			});
 
 			// Steuerungsleiste anzeigen
