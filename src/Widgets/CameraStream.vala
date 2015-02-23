@@ -22,6 +22,9 @@ namespace viewer.Widgets {
 		// Anzahl der in dieser Sekunde empfangenen Frames
 		private int frames_per_second = 0;
 
+		// Anzahl der in dieser Sekunde empfangenen Bits
+		private uint64 bits_per_second;
+
 		// Gibt an ob der UDP-Socket läuft
 		private bool udp_running = false;
 
@@ -103,9 +106,6 @@ namespace viewer.Widgets {
 				// Datenquelle erstellen
 				socket_source = socket.create_source (IOCondition.IN, cancellable);
 
-				// Puffergröße festlegen
-				var buffer_size = 102400; // 100KB
-
 				// Empfangsfunktion festlegen
 				socket_source.set_callback ((socket, condition) => {
 					// Fehler abfangen
@@ -114,9 +114,11 @@ namespace viewer.Widgets {
 						uint8 buffer[102400];
 
 						// Empfangene Daten in den Puffer schreiben und Länge prüfen
-						if (socket.receive (buffer) >= buffer_size) {
+						var received = socket.receive (buffer);
+
+						if (received >= buffer.length) {
 							// Puffer zu klein => Fehler
-							control_bar.set_status ("Die empfangenen Daten überschreiten die Puffergröße von %s.".printf (format_size (buffer_size)));
+							control_bar.set_status ("Die empfangenen Daten überschreiten die Puffergröße von %s.".printf (format_size (buffer.length)));
 						} else {
 							// Alles gut => Frame anzeigen
 							show_frame_from_data (buffer);
@@ -124,6 +126,9 @@ namespace viewer.Widgets {
 
 						// FPS hochzählen
 						frames_per_second++;
+
+						// Bits hochzählen
+						bits_per_second += received * 8;
 					} catch (Error e) {
 						// Fehler
 						control_bar.set_status (e.message);
@@ -146,10 +151,13 @@ namespace viewer.Widgets {
 					// Nur um sicher zu gehen...
 					if (image.pixbuf != null) {
 						// Bild vorhanden => Status aktualisieren
-						control_bar.set_status ("%dx%d -- %d FPS".printf (image.pixbuf.width, image.pixbuf.height, frames_per_second));
+						control_bar.set_status ("%dx%d -- %d FPS (%s)".printf (image.pixbuf.width, image.pixbuf.height, frames_per_second, format_speed (bits_per_second)));
 
 						// FPS zurücksetzen
 						frames_per_second = 0;
+
+						// Bits zurücksetzen
+						bits_per_second = 0;
 					}
 
 					// Timer weiterlaufen lassen solange der Socket läuft
@@ -213,6 +221,26 @@ namespace viewer.Widgets {
 				// Fehler
 				control_bar.set_status (e.message);
 			}
+		}
+
+		// Geschwindigkeit formatiert ausgeben
+		private string format_speed (uint64 bits) {
+			// Wert aufteilen
+			var TBit = (bits >> 40);
+			var GBit = (bits >> 30) & 0x03FF;
+			var MBit = (bits >> 20) & 0x03FF;
+			var KBit = (bits >> 10) & 0x03FF;
+			var Bit = bits & 0x03FF;
+
+			// Wert geeignet darstellen
+			var description = (TBit > 0 ? @"$TBit TBit/s und $GBit GBit/s" :
+					(GBit > 0 ? @"$GBit GBit/s und $MBit MBit/" :
+					(MBit > 0 ? @"$MBit MBit/s und $KBit KBit/s" :
+					(KBit > 0 ? @"$KBit KBit/s und $Bit Bit/s" :
+					(Bit > 0 ? @"$Bit Bit/s" : "")))));
+
+			// Beschreibung zurückgeben
+			return description;
 		}
 	}
 }
