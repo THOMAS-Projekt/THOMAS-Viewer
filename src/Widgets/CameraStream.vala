@@ -94,6 +94,10 @@ namespace viewer.Widgets {
 				// Statusmeldung
 				control_bar.set_status ("UDP-Socket wird erstellt...");
 
+				// Mess-Variablen zurücksetzen
+				frames_per_second = 0;
+				bits_per_second = 0;
+
 				// Cancel-Objekt erstellen
 				cancellable = new Cancellable ();
 
