@@ -105,7 +105,7 @@ namespace viewer.Widgets {
 				socket = new Socket (SocketFamily.IPV4, SocketType.DATAGRAM, SocketProtocol.UDP);
 
 				// Port festlegen
-				socket.bind (new InetSocketAddress (new InetAddress.loopback (SocketFamily.IPV4), port), true);
+				socket.bind (new InetSocketAddress (new InetAddress.any (SocketFamily.IPV4), port), true);
 
 				// Datenquelle erstellen
 				socket_source = socket.create_source (IOCondition.IN, cancellable);
