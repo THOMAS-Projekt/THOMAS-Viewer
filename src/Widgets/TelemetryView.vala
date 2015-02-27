@@ -50,29 +50,27 @@ namespace viewer.Widgets {
 
 			// Scrollbaren Bereich auf der rechten Seite anzeigen
 			this.pack2 (scrolled, false, false);
-
-			// Objekt wird zerstört
-			this.destroy.connect (() => {
-				// Verbindung beenden
-				tcp_disconnect ();
-			});
 		}
 
 		// Verbindung beenden
-		private void tcp_disconnect () {
-			// TODO: Verbindung beenden
+		public void tcp_disconnect (bool ?do_event = true) {
+			// TCP-Verbindung beenden
+			viewer.Backend.TCPClient.get_default ().close_connection ();
 
 			// UDP-Socket beenden
 			camera_stream.stop_socket ();
 
-			// Verbindung beendet
-			connection_closed ();
+			// Soll das Ereignis ausgelöst werden?
+			if (do_event) {
+				// Ja => Ereignis auslösen
+				connection_closed ();
+			}
 		}
 
 		// Socket starten
-		public void run_stream_receiver (uint16 port) {
+		public void run_stream_receiver () {
 			// UDP-Socket erstellen
-			camera_stream.run_socket (port);
+			camera_stream.run_socket ();
 		}
 	}
 }

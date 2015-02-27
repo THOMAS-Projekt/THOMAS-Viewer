@@ -1,4 +1,8 @@
 namespace viewer {
+	// Ports
+	const uint16 TCP_CLIENT_PORT = 4223;
+	const uint16 UDP_SERVER_PORT = 4222;
+
 	// Anwendung
 	public class viewerApp : Granite.Application {
 		// Hauptfenster

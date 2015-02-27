@@ -21,3 +21,12 @@ Dieses Datenübertragungsprotokoll definiert die Kommunikation zwischen dem Tele
 => 1. [BYTE]: = 1, Kommandobyte.
 => 2. [BYTE]: ID des Feldes.
 => 3. [string]: Wert (Endet mit \n).
+
+~ Felder:
+
+0. CPU
+1. RAM
+2. DISK
+3. SSID
+4. SIGNALSTRENGTH
+5. BANDWIDTH

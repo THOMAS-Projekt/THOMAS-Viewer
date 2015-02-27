@@ -88,7 +88,7 @@ namespace viewer.Widgets {
 		}
 
 		// Socket erstellen
-		public void run_socket (uint16 port) {
+		public void run_socket () {
 			// Fehler abfangen
 			try {
 				// Statusmeldung
@@ -105,7 +105,7 @@ namespace viewer.Widgets {
 				socket = new Socket (SocketFamily.IPV4, SocketType.DATAGRAM, SocketProtocol.UDP);
 
 				// Port festlegen
-				socket.bind (new InetSocketAddress (new InetAddress.any (SocketFamily.IPV4), port), true);
+				socket.bind (new InetSocketAddress (new InetAddress.any (SocketFamily.IPV4), UDP_SERVER_PORT), true);
 
 				// Datenquelle erstellen
 				socket_source = socket.create_source (IOCondition.IN, cancellable);
@@ -145,7 +145,8 @@ namespace viewer.Widgets {
 				// Mit der Hauptschleife verknüpfen
 				socket_source.attach (MainContext.default ());
 
-				// TODO: Befehl zum Starten der Übertragung senden und dem Server den Port mitteilen
+				// Ich bin bereit!
+				viewer.Backend.TCPClient.get_default ().send_udp_ready ();
 
 				// Socket gestartet
 				udp_running = true;

@@ -6,9 +6,11 @@ namespace viewer {
 
 		// Keys
 		static const string AUTO_RESIZE_KEY = "auto-resize";
+		static const string LAST_HOST_KEY = "last-host";
 
 		// Felder
 		public bool auto_resize { get; set; default = true; }
+		public string last_host { get; set; default = ""; }
 
 		// Ereignisse
 		// TODO
@@ -26,6 +28,7 @@ namespace viewer {
 
 			// Keys verknüpfen
 			this.settings.bind (AUTO_RESIZE_KEY, this, "auto-resize", SettingsBindFlags.DEFAULT);
+			this.settings.bind (LAST_HOST_KEY, this, "last-host", SettingsBindFlags.DEFAULT);
 		}
 
 		// Instanz abrufen

@@ -97,21 +97,25 @@ namespace viewer {
 
 			// Buttons zum Willkommensbildschirm hinzufügen
 			welcome.append ("edit", "Adresse eingeben", "Eine neue Adresse eingeben");
-			welcome.append ("media-playback-start", "Verbindung wiederherstellen", "Mit der zuletzt verwendeten Adresse verbinden");
+			welcome.append ("media-playback-start", "Verbindung wiederherstellen", "Mit \"%s\" verbinden".printf (SettingsManager.get_default ().last_host));
 
 			// Click-Ereignis des Willkommensbildschirmes setzen
 			welcome.activated.connect ((index) => {
-				// Welcher Button wurde gedrückt?
+				// Soll die Adresse vorm Verbinden aktualisiert werden?
 				if (index == 0) {
-					// Adresse eingeben => TODO: Eingabe-Dialog anzeigen
+					// Ja => TODO: Eingabe-Dialog anzeigen und adresse setzten
+				}
 
-					// TODO: Versuchen die Verbindung herzustellen
+				// TCP-Verbindung herstellen
+				viewer.Backend.TCPClient.get_default ();
 
-					// Telemetrie-Seite anzeigen
+				// Erfolgreich verbunden?
+				if (viewer.Backend.TCPClient.connected) {
+					// Ja => Telemetrie-Seite anzeigen
 					stack.set_visible_child_full ("telemetry", Gtk.StackTransitionType.SLIDE_LEFT);
 
 					// Kamera-Stream-Empfänger starten
-					telemetry_view.run_stream_receiver (4222);
+					telemetry_view.run_stream_receiver ();
 				}
 			});
 
@@ -138,6 +142,15 @@ namespace viewer {
 
 			// Stack zum Fenster hinzufügen
 			this.add (stack);
+
+			// Fenster wird geschlossen
+			this.destroy.connect (() => {
+				// Besteht eine Verbindung?
+				if (viewer.Backend.TCPClient.connected) {
+					// Ja => TCP-Server beenden
+					telemetry_view.tcp_disconnect (false);
+				}
+			});
 
 			// Alles anzeigen
 			this.show_all ();

@@ -42,6 +42,7 @@ vala_precompile(VALA_C
 	src/Widgets/ControlBar.vala
 	src/Widgets/Properties.vala
 	src/Widgets/SensorData.vala
+	src/Backend/TCPClient.vala
 PACKAGES
 	gtk+-3.0
 	gio-2.0

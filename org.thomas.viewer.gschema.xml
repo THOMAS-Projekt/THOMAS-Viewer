@@ -5,5 +5,9 @@
 			<default>true</default>
 			<summary>Das Kamerabild automatisch an die Fenstergröße anpassen</summary>
 		</key>
+		<key type="s" name="last-host">
+			<default>''</default>
+			<summary>Die Adresse des zuletzt verwendeten Hosts</summary>
+		</key>
 	</schema>
 </schemalist>
