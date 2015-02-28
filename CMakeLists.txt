@@ -42,6 +42,7 @@ vala_precompile(VALA_C
 	src/Widgets/ControlBar.vala
 	src/Widgets/Properties.vala
 	src/Widgets/SensorData.vala
+	src/Dialogs/SelectHostDialog.vala
 	src/Backend/TCPClient.vala
 PACKAGES
 	gtk+-3.0

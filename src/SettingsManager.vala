@@ -13,7 +13,7 @@ namespace viewer {
 		public string last_host { get; set; default = ""; }
 
 		// Ereignisse
-		// TODO
+		public signal void last_host_changed ();
 
 		// Gsettings-Client
 		public Settings? settings = null;
@@ -29,6 +29,9 @@ namespace viewer {
 			// Keys verknüpfen
 			this.settings.bind (AUTO_RESIZE_KEY, this, "auto-resize", SettingsBindFlags.DEFAULT);
 			this.settings.bind (LAST_HOST_KEY, this, "last-host", SettingsBindFlags.DEFAULT);
+
+			// Ereignisse verknüpfen
+			this.settings.changed[LAST_HOST_KEY].connect (() => { this.last_host_changed (); });
 		}
 
 		// Instanz abrufen

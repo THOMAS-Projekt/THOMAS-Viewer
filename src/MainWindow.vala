@@ -95,15 +95,24 @@ namespace viewer {
 			// Willkommensbildschirm erstellen
 			welcome = new Granite.Widgets.Welcome ("Nicht verbunden", "Bitte wähle eine Adresse");
 
-			// Buttons zum Willkommensbildschirm hinzufügen
-			welcome.append ("edit", "Adresse eingeben", "Eine neue Adresse eingeben");
-			welcome.append ("media-playback-start", "Verbindung wiederherstellen", "Mit \"%s\" verbinden".printf (SettingsManager.get_default ().last_host));
+			// Willkommensbildschirm füllen
+			fill_welcome ();
 
 			// Click-Ereignis des Willkommensbildschirmes setzen
 			welcome.activated.connect ((index) => {
 				// Soll die Adresse vorm Verbinden aktualisiert werden?
 				if (index == 0) {
-					// Ja => TODO: Eingabe-Dialog anzeigen und adresse setzten
+					// Server-Auswahl-Dialog erstellen
+					var dialog = new Dialogs.SelectHostDialog ();
+
+					// Rückgabe-Ereignis setzen
+					dialog.response.connect (() => {
+						// Dialog schließen
+						dialog.destroy();
+					});
+
+					// Dialog anzeigen
+					dialog.run ();
 				}
 
 				// TCP-Verbindung herstellen
@@ -154,6 +163,26 @@ namespace viewer {
 
 			// Alles anzeigen
 			this.show_all ();
+
+			// Ereignisse verknüpfen
+			SettingsManager.get_default ().last_host_changed.connect (() => {
+				// Willkommensbildschirm füllen
+				fill_welcome ();
+			});
+		}
+
+		// Items des Willkommensbildschirms erstellen
+		private void fill_welcome () {
+			// Ersten beiden Einträge löschen
+			welcome.remove_item (0);
+			welcome.remove_item (0);
+
+			// Buttons zum Willkommensbildschirm hinzufügen
+			welcome.append ("edit", "Adresse eingeben", "Eine neue Adresse eingeben");
+			welcome.append ("media-playback-start", "Verbindung wiederherstellen", "Mit \"%s\" verbinden".printf (SettingsManager.get_default ().last_host));
+
+			// Änderungen anzeigen
+			welcome.show_all ();
 		}
 	}
 }
