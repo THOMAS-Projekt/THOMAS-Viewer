@@ -19,6 +19,10 @@ namespace viewer.Widgets {
 		// Main-Loop
 		private MainLoop main_loop;
 
+		// Bildgröße
+		private int image_width = 0;
+		private int image_height = 0;
+
 		// Anzahl der in dieser Sekunde empfangenen Frames
 		private int frames_per_second = 0;
 
@@ -159,7 +163,7 @@ namespace viewer.Widgets {
 					// Nur um sicher zu gehen...
 					if (image.pixbuf != null) {
 						// Bild vorhanden => Status aktualisieren
-						control_bar.set_status ("%dx%d -- %d FPS (%s)".printf (image.pixbuf.width, image.pixbuf.height, frames_per_second, format_speed (bits_per_second)));
+						control_bar.set_status ("%dx%d -- %d FPS (%s)".printf (image_width, image_height, frames_per_second, format_speed (bits_per_second)));
 
 						// FPS zurücksetzen
 						frames_per_second = 0;
@@ -222,6 +226,10 @@ namespace viewer.Widgets {
 
 				// Bild abrufen
 				var pixbuf = loader.get_pixbuf ();
+
+				// Bildgröße merken
+				image_width = pixbuf.width;
+				image_height = pixbuf.height;
 
 				// Bildgröße automatisch anpassen?
 				if (SettingsManager.get_default ().auto_resize) {
