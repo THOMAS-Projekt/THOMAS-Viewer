@@ -19,6 +19,9 @@ namespace viewer.Widgets {
 		// Main-Loop
 		private MainLoop main_loop;
 
+		// Empfangspuffer
+		private Array<uint8> buffer;
+
 		// Bildgröße
 		private int image_width = 0;
 		private int image_height = 0;
@@ -119,24 +122,28 @@ namespace viewer.Widgets {
 					// Fehler abfangen
 					try {
 						// Puffer erstellen
-						uint8 buffer[100 * 1024];
+						uint8 data[64000]; // Paketgröße
 
 						// Empfangene Daten in den Puffer schreiben und Länge prüfen
-						var received = socket.receive (buffer);
+						var received = socket.receive (data);
 
-						if (received >= buffer.length) {
-							// Puffer zu klein => Fehler
-							control_bar.set_status ("Die empfangenen Daten überschreiten die Puffergröße von %s.".printf (format_size (buffer.length)));
-						} else {
-							// Alles gut => Frame anzeigen
-							show_frame_from_data (buffer);
+						// Daten an Puffer anhängen
+						buffer.append_vals (data, data.length);
+
+						// Volles Paket?
+						if (received < data.length) {
+							// Paket komplett => Frame anzeigen
+							show_frame_from_data (buffer.data);
+
+							// FPS hochzählen
+							frames_per_second++;
+
+							// Bits hochzählen
+							bits_per_second += buffer.length * 8;
+
+							// Empfangspuffer für die nächste Übertragung neu erstellen
+							buffer = new Array<uint8> ();
 						}
-
-						// FPS hochzählen
-						frames_per_second++;
-
-						// Bits hochzählen
-						bits_per_second += received * 8;
 					} catch (Error e) {
 						// Fehler
 						control_bar.set_status (e.message);
@@ -148,6 +155,9 @@ namespace viewer.Widgets {
 
 				// Mit der Hauptschleife verknüpfen
 				socket_source.attach (MainContext.default ());
+
+				// Empfangspuffer erstellen
+				buffer = new Array<uint8> ();
 
 				// Ich bin bereit!
 				viewer.Backend.TCPClient.get_default ().send_udp_ready ();
