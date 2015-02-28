@@ -115,7 +115,7 @@ namespace viewer.Widgets {
 					// Fehler abfangen
 					try {
 						// Puffer erstellen
-						uint8 buffer[102400];
+						uint8 buffer[100 * 1024];
 
 						// Empfangene Daten in den Puffer schreiben und Länge prüfen
 						var received = socket.receive (buffer);
@@ -150,6 +150,9 @@ namespace viewer.Widgets {
 
 				// Socket gestartet
 				udp_running = true;
+
+				// Bildqualität senden
+				viewer.Backend.TCPClient.get_default ().send_image_quality (SettingsManager.get_default ().image_size, SettingsManager.get_default ().image_quality);
 
 				// FPS-Timer erstellen
 				Timeout.add (1000, () => {

@@ -81,6 +81,22 @@ namespace viewer.Backend {
 			}
 		}
 
+		// Bildqualität des Streams setzen
+		public void send_image_quality (int image_size, int image_quality) {
+			// Fehler abfangen
+			try {
+				// Kommandobyte senden
+				connected = output_stream.put_byte (3);
+
+				// Werte validieren und senden
+				connected = output_stream.put_byte (image_quality < 0 ? 0 : (image_quality > 100 ? 100 : image_quality));
+				connected = output_stream.put_byte (image_size < 0 ? 0 : (image_size > 100 ? 100 : image_size));
+			} catch (Error e) {
+				// Fehler
+				show_error (e.message);
+			}
+		}
+
 		// Verbindung beenden
 		public void close_connection () {
 			// Verbindung beenden

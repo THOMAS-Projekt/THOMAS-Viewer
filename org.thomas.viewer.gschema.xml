@@ -9,5 +9,13 @@
 			<default>''</default>
 			<summary>Die Adresse des zuletzt verwendeten Hosts</summary>
 		</key>
+		<key type="i" name="image-size">
+			<default>50</default>
+			<summary>Die Bildgröße des Streams in Prozent</summary>
+		</key>
+		<key type="i" name="image-quality">
+			<default>30</default>
+			<summary>Die Bildqualität des Streams in Prozent</summary>
+		</key>
 	</schema>
 </schemalist>
