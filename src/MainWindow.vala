@@ -123,7 +123,16 @@ namespace viewer {
 					// Ja => Telemetrie-Seite anzeigen
 					stack.set_visible_child_full ("telemetry", Gtk.StackTransitionType.SLIDE_LEFT);
 
-					// Kamera-Stream-Empfänger starten
+					// Auf ein Trennen der Verbindung reagieren
+					viewer.Backend.TCPClient.get_default ().connection_error.connect (() => {
+						// Verbindung vollständig trennen und zur Startseite zurückgehren
+						telemetry_view.tcp_disconnect ();
+					});
+
+					// Telemetrie-Empfänger starten
+					telemetry_view.run_telemetry_receiver ();
+
+					// Kamera-Stream-Empfänger starten (Vorsicht: Läuft erst nach Trennen der Verbindung aus.)
 					telemetry_view.run_stream_receiver ();
 				}
 			});

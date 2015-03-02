@@ -50,6 +50,7 @@ PACKAGES
 	granite
 OPTIONS
 	--thread
+	--target-glib=2.32
 )
 
 add_executable(thomas-viewer ${VALA_C})

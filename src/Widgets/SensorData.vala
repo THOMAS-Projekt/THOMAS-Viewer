@@ -4,6 +4,9 @@ namespace viewer.Widgets {
 		// Anzahl an Zeilen
 		private int rows = 0;
 
+		// Start-Ereignis für die Timer
+		private signal void start_updates ();
+
 		// Instanzierung
 		public SensorData () {
 			// Abstände setzen
@@ -13,22 +16,22 @@ namespace viewer.Widgets {
 			// Abstand unten setzen
 			this.margin_bottom = 12;
 
-// Beispieleinträge
-add_headline ("System");
-add_entry ("Auslastung", "30 %");
-add_entry ("Speicher", "70 MB");
-add_entry ("/dev/sda1", "3,3 GB");
-add_headline ("Netzwerk");
-add_entry ("SSID", "Thomas-Projekt");
-add_entry ("Signalstärke", "70 %");
-add_entry ("Bandbreite", "30 Mbit/s");
-add_headline ("Ultraschall");
-add_entry ("Vorne Links", "131 cm");
-add_entry ("Vorne Mitte", "124 cm");
-add_entry ("Vorne Rechts", "145 cm");
-add_entry ("Hinten Links", "47 cm");
-add_entry ("Hinten Rechts", "23 cm");
+			// Einträge hinzufügen
+			add_headline ("System");
+			add_entry (0,	"Auslastung",	300);
+			add_entry (1,	"Speicher",		2000);
+			add_entry (2,	"Festplatte",	10000);
 
+			add_headline ("Netzwerk");
+			add_entry (3,	"SSID",			4000);
+			add_entry (4,	"Signalstärke",	1000);
+			add_entry (5,	"Bandbreite",	1000);
+		}
+
+		// Empfänger starten
+		public void run_receiver () {
+			// Und los geht's!
+			start_updates ();
 		}
 
 		// Überschrift hinzufügen
@@ -52,10 +55,10 @@ add_entry ("Hinten Rechts", "23 cm");
 		}
 
 		// Eintrag hinzufügen
-		private void add_entry (string field, string data) {
+		private void add_entry (uint id, string field, uint update_interval) {
 			// Labels erstellen
 			var field_label = new Gtk.Label (field);
-			var data_label = new Gtk.Label (data);
+			var data_label = new Gtk.Label ("--");
 
 			// Design-Klasse hinzufügen
 			field_label.get_style_context ().add_class ("h3");
@@ -76,6 +79,36 @@ add_entry ("Hinten Rechts", "23 cm");
 			// Labels zur Liste hinzufügen
 			this.attach (field_label, 0, rows, 1, 1);
 			this.attach (data_label, 1, rows++, 1, 1);
+
+			// Auto-Updates starten
+			start_updates.connect (() => {
+				// Rückgabe-Ereignis setzen
+				viewer.Backend.TCPClient.get_default ().telemetry_data_received.connect ((field_id, content) => {
+					// Korrekte ID?
+					if (field_id == id) {
+						// Dieses Feld ist gemeint => Wert übernehmen
+						data_label.label = content;
+					}
+				});
+
+				// Timer erstellen
+				Timeout.add (update_interval, () => {
+					// Besteht die Verbindung noch?
+					if (viewer.Backend.TCPClient.connected) {
+						// Ja => Neue Daten anfragen
+						viewer.Backend.TCPClient.get_default ().request_telemetry_data (id);
+
+						// Timer laufen lassen
+						return true;
+					} else {
+						// Nein => Text zurücksetzen
+						data_label.label = "--";
+
+						// Timer stoppen
+						return false;
+					}
+				});
+			});
 		}
 	}
 }

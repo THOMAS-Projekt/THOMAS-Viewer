@@ -66,6 +66,11 @@ namespace viewer {
 
 		// Main-Funktion
 		public static void main (string [] args) {
+			// Multi-Threading unterstützt?
+			if (!Thread.supported ())
+				// Nein => Fehler
+				critical ("Multi-Threading wird nicht unterstützt.");
+
 			// Anwendung instanzieren
 			var app = new viewer.viewerApp ();
 

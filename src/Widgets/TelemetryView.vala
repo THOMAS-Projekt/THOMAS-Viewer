@@ -54,8 +54,11 @@ namespace viewer.Widgets {
 
 		// Verbindung beenden
 		public void tcp_disconnect (bool ?do_event = true) {
-			// TCP-Verbindung beenden
-			viewer.Backend.TCPClient.get_default ().close_connection ();
+			// Ist der Client noch verbunden?
+			if (viewer.Backend.TCPClient.connected) {
+				// Ja => TCP-Verbindung beenden
+				viewer.Backend.TCPClient.get_default ().close_connection ();
+			}
 
 			// UDP-Socket beenden
 			camera_stream.stop_socket ();
@@ -71,6 +74,12 @@ namespace viewer.Widgets {
 		public void run_stream_receiver () {
 			// UDP-Socket erstellen
 			camera_stream.run_socket ();
+		}
+
+		// Telemetrie-Empfänger starten
+		public void run_telemetry_receiver () {
+			// Telemetrie-Empfänger starten
+			sensor_data.run_receiver ();
 		}
 	}
 }
