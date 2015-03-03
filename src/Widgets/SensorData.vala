@@ -18,7 +18,7 @@ namespace viewer.Widgets {
 
 			// Einträge hinzufügen
 			add_headline ("System");
-			add_entry (0,	"Auslastung",	300);
+			add_entry (0,	"Auslastung",	1000);
 			add_entry (1,	"Speicher",		2000);
 			add_entry (2,	"Festplatte",	10000);
 
