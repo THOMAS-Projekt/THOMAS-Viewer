@@ -51,7 +51,7 @@ namespace viewer.Widgets {
 			headline.margin_end = 40;
 
 			// Label zur Liste hinzufügen
-			this.attach (headline, 0, rows++, 2, 1);
+			this.attach (headline, 0, rows++, 3, 1);
 		}
 
 		// Eintrag hinzufügen
@@ -78,7 +78,13 @@ namespace viewer.Widgets {
 
 			// Labels zur Liste hinzufügen
 			this.attach (field_label, 0, rows, 1, 1);
-			this.attach (data_label, 1, rows++, 1, 1);
+			this.attach (data_label, 1, rows, 1, 1);
+
+			// Lade-Anzeige erstellen
+			var spinner = new Gtk.Spinner ();
+
+			// Lade-Anzeige zur Liste hinzufügen
+			this.attach (spinner, 2, rows++, 1, 1);
 
 			// Auto-Updates starten
 			start_updates.connect (() => {
@@ -88,6 +94,9 @@ namespace viewer.Widgets {
 					if (field_id == id) {
 						// Dieses Feld ist gemeint => Wert übernehmen
 						data_label.label = content;
+
+						// Lade-Anzeige stoppen
+						spinner.stop ();
 					}
 				});
 
@@ -95,7 +104,10 @@ namespace viewer.Widgets {
 				Timeout.add (update_interval, () => {
 					// Besteht die Verbindung noch?
 					if (viewer.Backend.TCPClient.connected) {
-						// Ja => Neue Daten anfragen
+						// Ja => Lade-Anzeige starten
+						spinner.start ();
+
+						// Neue Daten anfragen
 						viewer.Backend.TCPClient.get_default ().request_telemetry_data (id);
 
 						// Timer laufen lassen
