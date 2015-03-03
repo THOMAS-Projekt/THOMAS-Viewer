@@ -48,7 +48,7 @@ namespace viewer.Widgets {
 			// Abstände definieren
 			headline.margin_top = 6;
 			headline.margin_start = 12;
-			headline.margin_end = 40;
+			headline.margin_end = 140;
 
 			// Label zur Liste hinzufügen
 			this.attach (headline, 0, rows++, 3, 1);
@@ -115,6 +115,9 @@ namespace viewer.Widgets {
 					} else {
 						// Nein => Text zurücksetzen
 						data_label.label = "--";
+
+						// Lade-Anzeige stoppen
+						spinner.stop ();
 
 						// Timer stoppen
 						return false;
