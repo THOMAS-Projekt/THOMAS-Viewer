@@ -165,6 +165,9 @@ namespace viewer.Widgets {
 				// Socket gestartet
 				udp_running = true;
 
+				// Lasse dem Server einen Moment Zeit
+				Thread.usleep (1);
+
 				// Bildqualität senden
 				viewer.Backend.TCPClient.get_default ().send_image_quality (SettingsManager.get_default ().image_size, SettingsManager.get_default ().image_quality);
 
