@@ -102,28 +102,37 @@ namespace viewer.Widgets {
 
 				// Timer erstellen
 				Timeout.add (update_interval, () => {
-					// Besteht die Verbindung noch?
-					if (viewer.Backend.TCPClient.connected) {
-						// Ja => Lade-Anzeige starten
-						spinner.start ();
-
-						// Neue Daten anfragen
-						viewer.Backend.TCPClient.get_default ().request_telemetry_data (id);
-
-						// Timer laufen lassen
-						return true;
-					} else {
-						// Nein => Text zurücksetzen
-						data_label.label = "--";
-
-						// Lade-Anzeige stoppen
-						spinner.stop ();
-
-						// Timer stoppen
-						return false;
-					}
+					// Daten abfragen
+					return run_request (spinner, data_label, id);
 				});
+
+				// Daten zu Beginn einmal abrufen
+				run_request (spinner, data_label, id);
 			});
+		}
+
+		// Führt eine Abfrage aus und verwaltet die Grafische Ausgabe entsprechend
+		private bool run_request (Gtk.Spinner spinner, Gtk.Label data_label, uint id) {
+			// Besteht die Verbindung noch?
+			if (viewer.Backend.TCPClient.connected) {
+				// Ja => Lade-Anzeige starten
+				spinner.start ();
+
+				// Neue Daten anfragen
+				viewer.Backend.TCPClient.get_default ().request_telemetry_data (id);
+
+				// Timer laufen lassen
+				return true;
+			} else {
+				// Nein => Text zurücksetzen
+				data_label.label = "--";
+
+				// Lade-Anzeige stoppen
+				spinner.stop ();
+
+				// Timer stoppen
+				return false;
+			}
 		}
 	}
 }
