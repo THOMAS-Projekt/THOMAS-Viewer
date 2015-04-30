@@ -240,31 +240,37 @@ namespace viewer.Widgets {
 				// Bild abrufen
 				var pixbuf = loader.get_pixbuf ();
 
-				// Bildgröße merken
-				image_width = pixbuf.width;
-				image_height = pixbuf.height;
-
-				// Bildgröße automatisch anpassen?
-				if (SettingsManager.get_default ().auto_resize) {
-					// Ja => An welcher Seite soll er sich orientieren?
-					if (((float)this.get_allocated_width () / pixbuf.width) * pixbuf.height > this.get_allocated_height ()) {
-						// An der Höhe Orientieren => Neue Breite berechnen
-						var new_width = (int)(((float)this.get_allocated_height () / pixbuf.height) * pixbuf.width);
-						var new_height = this.get_allocated_height ();
-
-						// Skaliertes Bild anzeigen
-						image.pixbuf = pixbuf.scale_simple (new_width, new_height, Gdk.InterpType.TILES);
-					} else {
-						// An der Breite Orientieren => Neue Höhe berechnen
-						var new_width = this.get_allocated_width ();
-						var new_height = (int)(((float)this.get_allocated_width () / pixbuf.width) * pixbuf.height);
-
-						// Skaliertes Bild anzeigen
-						image.pixbuf = pixbuf.scale_simple (new_width, new_height, Gdk.InterpType.TILES);
-					}
+				// Erfolgreich verarbeitet?
+				if (pixbuf == null) {
+					// Nein => Fehler
+					control_bar.set_status ("Puffer konnte nicht verarbeitet werden - Fehlerhafter Datenstrom!");
 				} else {
-					// Nein => Originalbild anzeigen
-					image.pixbuf = pixbuf;
+					// Ja => Bildgröße merken
+					image_width = pixbuf.width;
+					image_height = pixbuf.height;
+
+					// Bildgröße automatisch anpassen?
+					if (SettingsManager.get_default ().auto_resize) {
+						// Ja => An welcher Seite soll er sich orientieren?
+						if (((float)this.get_allocated_width () / pixbuf.width) * pixbuf.height > this.get_allocated_height ()) {
+							// An der Höhe Orientieren => Neue Breite berechnen
+							var new_width = (int)(((float)this.get_allocated_height () / pixbuf.height) * pixbuf.width);
+							var new_height = this.get_allocated_height ();
+
+							// Skaliertes Bild anzeigen
+							image.pixbuf = pixbuf.scale_simple (new_width, new_height, Gdk.InterpType.TILES);
+						} else {
+							// An der Breite Orientieren => Neue Höhe berechnen
+							var new_width = this.get_allocated_width ();
+							var new_height = (int)(((float)this.get_allocated_width () / pixbuf.width) * pixbuf.height);
+
+							// Skaliertes Bild anzeigen
+							image.pixbuf = pixbuf.scale_simple (new_width, new_height, Gdk.InterpType.TILES);
+						}
+					} else {
+						// Nein => Originalbild anzeigen
+						image.pixbuf = pixbuf;
+					}
 				}
 			} catch (Error e) {
 				// Fehler
