@@ -127,6 +127,9 @@ namespace viewer.Widgets {
 						// Empfangene Daten in den Puffer schreiben und Länge prüfen
 						var received = socket.receive (data);
 
+						// Bits hochzählen
+						bits_per_second += (uint64) received * 8;
+
 						// Daten an Puffer anhängen
 						buffer.append_vals (data, data.length);
 
@@ -137,9 +140,6 @@ namespace viewer.Widgets {
 
 							// FPS hochzählen
 							frames_per_second++;
-
-							// Bits hochzählen
-							bits_per_second += buffer.length * 8;
 
 							// Empfangspuffer für die nächste Übertragung neu erstellen
 							buffer = new Array<uint8> ();
