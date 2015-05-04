@@ -19,13 +19,13 @@ namespace viewer.Widgets {
 			// Einträge hinzufügen
 			add_headline ("System");
 			add_entry (0,	"Auslastung",	1000);
-			add_entry (1,	"Speicher",		2000);
+			/*add_entry (1,	"Speicher",		2000);
 			add_entry (2,	"Festplatte",	10000);
 
 			add_headline ("Netzwerk");
 			add_entry (3,	"SSID",			4000);
 			add_entry (4,	"Signalstärke",	1000);
-			add_entry (5,	"Bandbreite",	1000);
+			add_entry (5,	"Bandbreite",	1000);*/
 		}
 
 		// Empfänger starten
@@ -92,11 +92,15 @@ namespace viewer.Widgets {
 				viewer.Backend.TCPClient.get_default ().telemetry_data_received.connect ((field_id, content) => {
 					// Korrekte ID?
 					if (field_id == id) {
-						// Dieses Feld ist gemeint => Wert übernehmen
-						data_label.label = content;
+						Idle.add (() => {
+							// Dieses Feld ist gemeint => Wert übernehmen
+							data_label.label = content;
+							// Lade-Anzeige stoppen
+							spinner.stop ();
 
-						// Lade-Anzeige stoppen
-						spinner.stop ();
+							// Fertig
+							return false;
+						});
 					}
 				});
 
