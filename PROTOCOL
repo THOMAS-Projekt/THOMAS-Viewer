@@ -1,6 +1,10 @@
 -- THOMAS-TELEMETRIE-PROTOKOLL --
 Dieses Datenübertragungsprotokoll definiert die Kommunikation zwischen dem Telemetrie-Server [S] und dem Anzeige-Programm [C].
 
+~ Paketübertragung:
+
+=> 1. [BYTE]: Paketlänge (max. 255)
+=> 2. [BYTE[Paketlänge]]: Paket
 
 ~ Kommunikation:
 

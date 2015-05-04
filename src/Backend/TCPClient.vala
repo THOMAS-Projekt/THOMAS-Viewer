@@ -131,7 +131,7 @@ namespace viewer.Backend {
 				port[1] = (uint8)(UDP_SERVER_PORT & 0xff);
 
 				// Daten senden
-				output_stream.write ({1, port[0], port[1]});
+				output_stream.write ({3, 1, port[0], port[1]});
 			} catch (Error e) {
 				// Fehler
 				show_error (e.message);
@@ -143,7 +143,7 @@ namespace viewer.Backend {
 			// Fehler abfangen
 			try {
 				// Daten senden
-				output_stream.write ({2, (uint8)id});
+				output_stream.write ({2, 2, (uint8)id});
 			} catch (Error e) {
 				// Fehler
 				show_error (e.message);
@@ -159,7 +159,7 @@ namespace viewer.Backend {
 				uint8 size_value = image_size < 0 ? 0 : (image_size > 100 ? 100 : image_size);
 
 				// Daten senden
-				output_stream.write ({3, quality_value, size_value});
+				output_stream.write ({3, 3, quality_value, size_value});
 			} catch (Error e) {
 				// Fehler
 				show_error (e.message);
