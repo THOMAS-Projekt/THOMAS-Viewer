@@ -26,6 +26,9 @@ namespace viewer.Widgets {
 			add_entry (3,	"SSID",			4000);
 			add_entry (4,	"Signalstärke",	1000);
 			add_entry (5,	"Bandbreite",	1000);
+
+			add_headline ("Sensorik");
+			add_entry (6,	"Laser",		250);
 		}
 
 		// Empfänger starten

@@ -34,3 +34,4 @@ Dieses Datenübertragungsprotokoll definiert die Kommunikation zwischen dem Tele
 3. SSID
 4. SIGNALSTRENGTH
 5. BANDWIDTH
+6. LASER_DISTANCE

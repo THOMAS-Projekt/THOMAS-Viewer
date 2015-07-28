@@ -53,6 +53,8 @@ OPTIONS
 	--target-glib=2.32
 )
 
+add_definitions (-w)
+
 add_executable(thomas-viewer ${VALA_C})
 
 include(GSettings)
