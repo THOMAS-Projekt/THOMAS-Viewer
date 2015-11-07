@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
 	<schema path="/org/thomas/viewer/" id="org.thomas.viewer" gettext-domain="viewer">
-		<key type="b" name="auto-resize">
+		<key type="b" name="show-side-bar">
 			<default>true</default>
-			<summary>Das Kamerabild automatisch an die Fenstergröße anpassen</summary>
+			<summary>Gibt an ob die Seitenleiste sichtbar ist</summary>
 		</key>
 		<key type="s" name="last-host">
 			<default>''</default>
 			<summary>Die Adresse des zuletzt verwendeten Hosts</summary>
 		</key>
-		<key type="i" name="image-size">
-			<default>50</default>
-			<summary>Die Bildgröße des Streams in Prozent</summary>
+		<key type="b" name="auto-resize">
+			<default>true</default>
+			<summary>Das Kamerabild automatisch an die Fenstergröße anpassen</summary>
 		</key>
 		<key type="i" name="image-quality">
-			<default>30</default>
+			<default>70</default>
 			<summary>Die Bildqualität des Streams in Prozent</summary>
+		</key>
+		<key type="i" name="image-density">
+			<default>100</default>
+			<summary>Die Bildgröße des Streams in Prozent</summary>
 		</key>
 	</schema>
 </schemalist>

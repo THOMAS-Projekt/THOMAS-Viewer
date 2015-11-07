@@ -1,69 +1,39 @@
+# Projektname
 project (thomas-viewer)
+
+# Minimalanforderungen
 cmake_minimum_required (VERSION 2.8)
 cmake_policy (VERSION 2.6)
 
-set (DATADIR "${CMAKE_INSTALL_PREFIX}/share/thomas-viewer")
-set (PKGDATADIR "${DATADIR}/thomas-viewer")
-set (RELEASE_NAME "thomas-viewer")
+# Konfiguration
+set (DATADIR "${CMAKE_INSTALL_PREFIX}/share/${CMAKE_PROJECT_NAME}")
+set (PKGDATADIR "${DATADIR}/${CMAKE_PROJECT_NAME}")
+set (RELEASE_NAME "${CMAKE_PROJECT_NAME}")
 set (VERSION "0.1")
 set (VERSION_INFO "Release")
 set (PREFIX ${CMAKE_INSTALL_PREFIX})
 set (DOLLAR "$")
 
+# CMake-Dateien
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-file(GLOB_RECURSE sources src/*.vala)
-
+# Konfigurationsdatei generieren
 configure_file (${CMAKE_SOURCE_DIR}/src/config.vala.cmake ${CMAKE_SOURCE_DIR}/src/config.vala)
 
+# Auf Vala-Unterstützung prüfen
 find_package (Vala REQUIRED)
 include (ValaVersion)
 ensure_vala_version ("0.18" MINIMUM)
 include (ValaPrecompile)
 
-find_package(PkgConfig)
-pkg_check_modules(DEPS REQUIRED granite gtk+-3.0 gthread-2.0 gio-2.0)
-add_definitions(${DEPS_CFLAGS})
-link_libraries(${DEPS_LIBRARIES})
-link_directories(${DEPS_LIBRARY_DIRS})
+# Auf Bibliotheken prüfen
+find_package (PkgConfig)
+pkg_check_modules (DEPS REQUIRED granite gtk+-3.0 gthread-2.0 gio-2.0)
+add_definitions (${DEPS_CFLAGS})
+link_libraries (${DEPS_LIBRARIES})
+link_directories (${DEPS_LIBRARY_DIRS})
 
-find_package(Vala REQUIRED)
-include(ValaVersion)
-ensure_vala_version("0.16.0" MINIMUM)
-
-include(ValaPrecompile)
-vala_precompile(VALA_C
-	src/config.vala
-	src/viewer.vala
-	src/MainWindow.vala
-	src/SettingsManager.vala
-	src/Widgets/TelemetryView.vala
-	src/Widgets/CameraStream.vala
-	src/Widgets/ControlBar.vala
-	src/Widgets/Properties.vala
-	src/Widgets/SensorData.vala
-	src/Dialogs/SelectHostDialog.vala
-	src/Backend/TCPClient.vala
-PACKAGES
-	gtk+-3.0
-	gio-2.0
-	granite
-OPTIONS
-	--thread
-	--target-glib=2.32
-)
-
-add_definitions (-w)
-
-add_executable(thomas-viewer ${VALA_C})
-
-include(GSettings)
-add_schema("org.thomas.viewer.gschema.xml")
-
-install (TARGETS thomas-viewer RUNTIME DESTINATION bin)
-
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/thomas-viewer.desktop DESTINATION share/applications)
-
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/128/thomas-viewer.svg DESTINATION share/icons/hicolor/128x128/apps)
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/64/thomas-viewer.svg DESTINATION share/icons/hicolor/64x64/apps)
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/48/thomas-viewer.svg DESTINATION share/icons/hicolor/48x48/apps)
+# Unterverzeichnisse einbeziehen
+add_subdirectory (src)
+add_subdirectory (data)
+add_subdirectory (schemas)

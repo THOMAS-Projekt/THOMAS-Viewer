@@ -1,197 +1,115 @@
-namespace viewer {
-	// Hauptfenster
-	public class MainWindow : Gtk.Window {
-		// Anwendung
-		private viewerApp app;
+/*
+ * Copyright (c) 2011-2015 THOMAS-Projekt (https://thomas-projekt.de)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
 
-		// Vollbildmodus aktiv?
-		private bool fullscreened = false;
+public class Viewer.MainWindow : Gtk.Window {
+    private Backend.SettingsManager settings_manager;
+    private Backend.BusManager bus_manager;
 
-		// Headerbar
-		private Gtk.HeaderBar header_bar;
+    private Gtk.HeaderBar header_bar;
 
-		// Stack
-		private Gtk.Stack stack;
+    private Gtk.StackSwitcher stack_switcher;
 
-		// Willkommensbildschirm
-		private Granite.Widgets.Welcome welcome;
+    private Gtk.ToolButton side_bar_toggle;
 
-		// Telemetrie-Seite
-		private Widgets.TelemetryView telemetry_view;
+    private Gtk.Paned paned;
 
-		// Instanzierung
-		public MainWindow (viewerApp app) {
-			// Anwendung setzen
-			this.app = app;
-			this.set_application (app);
+    private Gtk.Stack stack;
 
-			// Dunkles Theme verwenden
-			Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
+    private Widgets.ConfigurationPage configuration_page;
+    private Widgets.CameraPage camera_page;
 
-			// Fenstergröße setzen
-			this.set_default_size (1000, 600);
+    private Widgets.SideBar side_bar;
 
-			// Fensterposition setzen
-			this.window_position = Gtk.WindowPosition.CENTER;
+    public MainWindow (Viewer.Application application) {
+        this.set_application (application);
 
-			// Tastendruck
-			this.key_press_event.connect ((event) => {
-				// Taste analysieren
-				switch (event.keyval) {
-					// F11
-					case Gdk.Key.F11:
-						// Bereits im Vollbildmodus?
-						if (!fullscreened) {
-							// Nein => Vollbildmodus starten
-							this.fullscreen ();
-							fullscreened = true;
-						} else {
-							// Ja => Vollbildmodus beenden
-							this.unfullscreen ();
-							fullscreened = false;
-						}
+        settings_manager = new Backend.SettingsManager ();
+        bus_manager = new Backend.BusManager (settings_manager);
 
-						// Fertig!
-						break;
+        configure_gtk ();
+        build_ui ();
+        create_bindings ();
+        connect_signals ();
+    }
 
-					// Escape
-					case Gdk.Key.Escape:
-						// Vollbildmodus aktiv?
-						if (fullscreened) {
-							// Ja => Vollbildmodus beenden
-							this.unfullscreen ();
-							fullscreened = false;
-						}
+    private void configure_gtk () {
+        Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
+    }
 
-						// Fertig!
-						break;
-				}
+    private void build_ui () {
+        header_bar = new Gtk.HeaderBar ();
+        header_bar.show_close_button = true;
 
-				// Fertig!
-				return true;
-			});
+        stack_switcher = new Gtk.StackSwitcher ();
 
-			// Headerbar erstellen
-			header_bar = new Gtk.HeaderBar ();
+        side_bar_toggle = new Gtk.ToolButton (null, null);
+        side_bar_toggle.icon_name = (settings_manager.show_side_bar) ? "pane-hide-symbolic" : "pane-show-symbolic";
 
-			// Fenstertitel setzen
-			header_bar.title = "THOMAS-Viewer";
+        header_bar.custom_title = stack_switcher;
+        header_bar.pack_end (side_bar_toggle);
 
-			// Schließen-Button anzeigen
-			header_bar.show_close_button = true;
+        this.set_titlebar (header_bar);
 
-			// "header-bar"-Klasse vom Objekt entfernen
-			header_bar.get_style_context ().remove_class ("header-bar");
+        paned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
 
-			// Headerbar als Titelleiste setzen
-			this.set_titlebar (header_bar);
+        stack = new Gtk.Stack ();
 
-			// Stack erstellen
-			stack = new Gtk.Stack ();
+        configuration_page = new Widgets.ConfigurationPage (settings_manager, bus_manager);
+        camera_page = new Widgets.CameraPage ();
 
-			// Animationsgeschwindigkeit setzen
-			stack.transition_duration = 400;
+        stack.add_titled (configuration_page, "configuration", "Konfiguration");
+        stack.add_titled (camera_page, "camera", "Kamera");
 
-			// Willkommensbildschirm erstellen
-			welcome = new Granite.Widgets.Welcome ("Nicht verbunden", "Bitte wähle eine Adresse");
+        side_bar = new Widgets.SideBar ();
+        side_bar.no_show_all = true;
 
-			// Willkommensbildschirm füllen
-			fill_welcome ();
+        stack_switcher.stack = stack;
 
-			// Click-Ereignis des Willkommensbildschirmes setzen
-			welcome.activated.connect ((index) => {
-				// Soll die Adresse vorm Verbinden aktualisiert werden?
-				if (index == 0) {
-					// Server-Auswahl-Dialog erstellen
-					var dialog = new Dialogs.SelectHostDialog ();
+        paned.pack1 (stack, true, false);
+        paned.pack2 (side_bar, false, false);
 
-					// Rückgabe-Ereignis setzen
-					dialog.response.connect (() => {
-						// Dialog schließen
-						dialog.destroy();
-					});
+        this.add (paned);
+    }
 
-					// Dialog anzeigen
-					dialog.run ();
-				}
+    private void create_bindings () {
+        /* Regelt die Sichtbarkeit der Seitenleiste */
+        settings_manager.bind_property ("show-side-bar",
+                                        side_bar,
+                                        "visible",
+                                        BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+    }
 
-				// TCP-Verbindung herstellen
-				viewer.Backend.TCPClient.get_default ();
+    private void connect_signals () {
+        bus_manager.connection_failure.connect ((message) => {
+            warning ("Verbindungsfehler: %s", message);
 
-				// Erfolgreich verbunden?
-				if (viewer.Backend.TCPClient.connected) {
-					// Ja => Telemetrie-Seite anzeigen
-					stack.set_visible_child_full ("telemetry", Gtk.StackTransitionType.SLIDE_LEFT);
+            /* TODO: Warnung grafisch anzeigen. */
+        });
 
-					// Auf ein Trennen der Verbindung reagieren
-					viewer.Backend.TCPClient.get_default ().connection_error.connect (() => {
-						// Verbindung vollständig trennen und zur Startseite zurückgehren
-						telemetry_view.tcp_disconnect ();
-					});
+        bus_manager.action_failure.connect ((message) => {
+            warning ("Zugriffsfehler: %s", message);
 
-					// Telemetrie-Empfänger starten
-					telemetry_view.run_telemetry_receiver ();
+            /* TODO: Warnung grafisch anzeigen. */
+        });
 
-					// Kamera-Stream-Empfänger starten (Vorsicht: Läuft erst nach Trennen der Verbindung aus.)
-					telemetry_view.run_stream_receiver ();
-				}
-			});
-
-			// Willkommensbildschirm zum Stack hinzufügen
-			stack.add_named (welcome, "welcome");
-
-			// Telemetrie-Seite erstellen
-			telemetry_view = new Widgets.TelemetryView ();
-
-			// Verbindung wurde beendet
-			telemetry_view.connection_closed.connect (() => {
-				// Zurück zur Startseite
-				stack.set_visible_child_full ("welcome", Gtk.StackTransitionType.SLIDE_RIGHT);
-			});
-
-			// Der Info-Button wurde gedrückt
-			telemetry_view.about_button_clicked.connect (() => {
-				// Info-Dialog anzeigen
-				app.show_about (this);
-			});
-
-			// Telemetrie-Seite zum Stack hinzufügen
-			stack.add_named (telemetry_view, "telemetry");
-
-			// Stack zum Fenster hinzufügen
-			this.add (stack);
-
-			// Fenster wird geschlossen
-			this.destroy.connect (() => {
-				// Besteht eine Verbindung?
-				if (viewer.Backend.TCPClient.connected) {
-					// Ja => TCP-Server beenden
-					telemetry_view.tcp_disconnect (false);
-				}
-			});
-
-			// Alles anzeigen
-			this.show_all ();
-
-			// Ereignisse verknüpfen
-			SettingsManager.get_default ().last_host_changed.connect (() => {
-				// Willkommensbildschirm füllen
-				fill_welcome ();
-			});
-		}
-
-		// Items des Willkommensbildschirms erstellen
-		private void fill_welcome () {
-			// Ersten beiden Einträge löschen
-			welcome.remove_item (0);
-			welcome.remove_item (0);
-
-			// Buttons zum Willkommensbildschirm hinzufügen
-			welcome.append ("edit", "Adresse eingeben", "Eine neue Adresse eingeben");
-			welcome.append ("media-playback-start", "Verbindung wiederherstellen", "Mit \"%s\" verbinden".printf (SettingsManager.get_default ().last_host));
-
-			// Änderungen anzeigen
-			welcome.show_all ();
-		}
-	}
+        side_bar_toggle.clicked.connect (() => {
+            side_bar_toggle.set_icon_name ((settings_manager.show_side_bar = !settings_manager.show_side_bar) ? "pane-hide-symbolic" : "pane-show-symbolic");
+        });
+    }
 }
