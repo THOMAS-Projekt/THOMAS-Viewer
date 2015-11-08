@@ -33,6 +33,7 @@ public class Viewer.Backend.BusManager : Object {
 
     public signal void connection_failure (string message);
     public signal void action_failure (string message);
+    public signal void action_success ();
 
     public SettingsManager settings_manager { private get; construct; }
 
@@ -75,6 +76,8 @@ public class Viewer.Backend.BusManager : Object {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
                     action_failure ("Ein Zugriff auf die Motorsteuerung wird nicht unterstützt.");
+                } else {
+                    action_success ();
                 }
             } catch (Error e) {
                 connection_failure (e.message);
@@ -104,6 +107,8 @@ public class Viewer.Backend.BusManager : Object {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
                     action_failure ("Ein Zugriff auf die Motorsteuerung wird nicht unterstützt.");
+                } else {
+                    action_success ();
                 }
             } catch (Error e) {
                 connection_failure (e.message);
@@ -133,6 +138,8 @@ public class Viewer.Backend.BusManager : Object {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
                     action_failure ("Ein Zugriff auf die Kamerasteuerung wird nicht unterstützt.");
+                } else {
+                    action_success ();
                 }
             } catch (Error e) {
                 connection_failure (e.message);
@@ -162,6 +169,8 @@ public class Viewer.Backend.BusManager : Object {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
                     action_failure ("Ein Zugriff auf die Kamerasteuerung wird nicht unterstützt.");
+                } else {
+                    action_success ();
                 }
             } catch (Error e) {
                 connection_failure (e.message);
@@ -197,6 +206,7 @@ public class Viewer.Backend.BusManager : Object {
                     action_failure ("Ein Zugriff auf die Kamera wird nicht unterstützt.");
                 } else {
                     stream_registered (streamer_id);
+                    action_success ();
                 }
             } catch (Error e) {
                 connection_failure (e.message);
@@ -230,6 +240,40 @@ public class Viewer.Backend.BusManager : Object {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
                     action_failure ("Ein Zugriff auf die Kamerasteuerung wird nicht unterstützt.");
+                } else {
+                    action_success ();
+                }
+            } catch (Error e) {
+                connection_failure (e.message);
+            }
+        });
+    }
+
+    public void set_camera_stream_options (int streamer_id, int image_quality, int image_density) {
+        if (!validate_connection ()) {
+            return;
+        }
+
+        Variant[] parameters = {
+            new Variant.int32 (streamer_id),
+            new Variant.int32 (image_quality),
+            new Variant.int32 (image_density)
+        };
+
+        connection.call.begin (null,
+                               SERVER_PATH,
+                               SERVER_NAME,
+                               "SetCameraStreamOptions",
+                               new Variant.tuple (parameters),
+                               VariantType.TUPLE,
+                               DBusCallFlags.NONE,
+                               CALL_TIMEOUT,
+                               null, (obj, res) => {
+            try {
+                if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
+                    action_failure ("Ein Zugriff auf die Kamerasteuerung wird nicht unterstützt.");
+                } else {
+                    action_success ();
                 }
             } catch (Error e) {
                 connection_failure (e.message);

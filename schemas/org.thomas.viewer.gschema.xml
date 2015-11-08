@@ -13,13 +13,9 @@
 			<default>true</default>
 			<summary>Das Kamerabild automatisch an die Fenstergröße anpassen</summary>
 		</key>
-		<key type="i" name="image-quality">
+		<key type="i" name="stream-quality">
 			<default>70</default>
 			<summary>Die Bildqualität des Streams in Prozent</summary>
-		</key>
-		<key type="i" name="image-density">
-			<default>100</default>
-			<summary>Die Bildgröße des Streams in Prozent</summary>
 		</key>
 	</schema>
 </schemalist>

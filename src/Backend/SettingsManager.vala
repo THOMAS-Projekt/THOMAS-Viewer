@@ -21,8 +21,7 @@ public class Viewer.Backend.SettingsManager : Granite.Services.Settings {
     public bool show_side_bar { get; set; default = true; }
     public string last_host { get; set; default = ""; }
     public bool auto_resize { get; set; default = true; }
-    public int image_quality { get; set; default = 70; }
-    public int image_density { get; set; default = 100; }
+    public int stream_quality { get; set; default = 70; }
 
     public SettingsManager () {
         base ("org.thomas.viewer");
