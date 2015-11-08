@@ -162,15 +162,17 @@ public class Viewer.Backend.BusManager : Object {
         });
     }
 
-    public void start_camera_stream (string viewer_host, uint16 viewer_port) {
+    public async int start_camera_stream (string viewer_host, uint16 viewer_port) {
         if (!validate_connection ()) {
-            return;
+            return -1;
         }
 
         Variant[] parameters = {
             new Variant.string (viewer_host),
             new Variant.uint16 (viewer_port)
         };
+
+        int streamer_id = -1;
 
         connection.call.begin (null,
                                SERVER_PATH,
@@ -182,12 +184,45 @@ public class Viewer.Backend.BusManager : Object {
                                CALL_TIMEOUT,
                                null, (obj, res) => {
             try {
-                int streamer_id = connection.call.end (res).get_child_value (0).get_int32 ();
+                streamer_id = connection.call.end (res).get_child_value (0).get_int32 ();
 
                 if (streamer_id < 0) {
                     action_failure ("Ein Zugriff auf die Kamera wird nicht unterstützt.");
                 } else {
                     stream_registered (streamer_id);
+                }
+            } catch (Error e) {
+                connection_failure (e.message);
+            }
+
+            start_camera_stream.callback ();
+        });
+        yield;
+
+        return streamer_id;
+    }
+
+    public void stop_camera_stream (int streamer_id) {
+        if (!validate_connection ()) {
+            return;
+        }
+
+        Variant[] parameters = {
+            new Variant.int32 (streamer_id)
+        };
+
+        connection.call.begin (null,
+                               SERVER_PATH,
+                               SERVER_NAME,
+                               "StopCameraStream",
+                               new Variant.tuple (parameters),
+                               VariantType.TUPLE,
+                               DBusCallFlags.NONE,
+                               CALL_TIMEOUT,
+                               null, (obj, res) => {
+            try {
+                if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
+                    action_failure ("Ein Zugriff auf die Kamerasteuerung wird nicht unterstützt.");
                 }
             } catch (Error e) {
                 connection_failure (e.message);

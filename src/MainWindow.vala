@@ -39,6 +39,9 @@ public class Viewer.MainWindow : Gtk.Window {
 
     private Widgets.SideBar side_bar;
 
+    /* Die ID des aktuell laufenden Kamerastreames. */
+    private int camera_streamer_id = -1;
+
     public MainWindow (Viewer.Application application) {
         this.set_application (application);
 
@@ -114,14 +117,35 @@ public class Viewer.MainWindow : Gtk.Window {
 
         stack.notify["visible-child-name"].connect (() => {
             if (stack.visible_child_name == "camera") {
-                bus_manager.start_camera_stream (Environment.get_host_name (), CAMERA_STREAMER_PORT);
+                start_camera_stream ();
+            } else {
+                stop_camera_stream ();
             }
-
-            /* TODO: Kameraübertragung beim Verlassen der Kamera-Seite stoppen. */
         });
 
         side_bar_toggle.clicked.connect (() => {
             side_bar_toggle.set_icon_name ((settings_manager.show_side_bar = !settings_manager.show_side_bar) ? "pane-hide-symbolic" : "pane-show-symbolic");
         });
+    }
+
+    private void start_camera_stream () {
+        if (camera_streamer_id != -1) {
+            /* Der Stream läuft bereits. */
+            return;
+        }
+
+        bus_manager.start_camera_stream.begin (Environment.get_host_name (), CAMERA_STREAMER_PORT, (obj, res) => {
+            camera_streamer_id = bus_manager.start_camera_stream.end (res);
+        });
+    }
+
+    private void stop_camera_stream () {
+        if (camera_streamer_id == -1) {
+            /* Es läuft kein Stream mehr. */
+            return;
+        }
+
+        bus_manager.stop_camera_stream (camera_streamer_id);
+        camera_streamer_id = -1;
     }
 }
