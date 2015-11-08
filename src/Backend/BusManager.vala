@@ -42,6 +42,13 @@ public class Viewer.Backend.BusManager : Object {
         Object (settings_manager : settings_manager);
     }
 
+    ~BusManager () {
+        if (connection != null && !connection.closed) {
+            connection.close.begin ();
+            debug ("DBus-Verbindung geschlossen.");
+        }
+    }
+
     public void invalidate_connection () {
         connection = null;
     }

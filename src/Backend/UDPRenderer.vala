@@ -23,6 +23,7 @@ public class Viewer.Backend.UDPRenderer : Object {
     public signal void frame_received (Gdk.Pixbuf frame);
 
     private Socket udp_socket;
+    private SocketSource? source = null;
 
     public UDPRenderer (uint16 port) {
         try {
@@ -39,7 +40,7 @@ public class Viewer.Backend.UDPRenderer : Object {
 
         Gdk.PixbufLoader frame_loader = new Gdk.PixbufLoader ();
 
-        SocketSource source = udp_socket.create_source (IOCondition.IN);
+        source = udp_socket.create_source (IOCondition.IN);
         source.set_callback ((socket, condition) => {
             try {
                 uint8[] package = new uint8[MAX_PACKAGE_SIZE];
@@ -70,5 +71,12 @@ public class Viewer.Backend.UDPRenderer : Object {
         });
 
         source.attach (MainContext.@default ());
+    }
+
+    ~UDPRenderer () {
+        if (source != null) {
+            source.destroy ();
+            udp_socket.close ();
+        }
     }
 }
