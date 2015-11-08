@@ -144,6 +144,10 @@ public class Viewer.MainWindow : Gtk.Window {
             info_bar.hide ();
         });
 
+        info_bar.response.connect (() => {
+            info_bar.hide ();
+        });
+
         stack.notify["visible-child-name"].connect (() => {
             if (stack.visible_child_name == "camera") {
                 start_camera_stream ();
