@@ -21,6 +21,8 @@ public class Viewer.Backend.BusManager : Object {
     private static const string SERVER_PATH = "/thomas/server";
     private static const string SERVER_NAME = "thomas.server";
 
+    private static const int CALL_TIMEOUT = 10 * 1000;
+
     public enum Motor {
         LEFT = 2,
         RIGHT = 1,
@@ -61,7 +63,7 @@ public class Viewer.Backend.BusManager : Object {
                                new Variant.tuple (parameters),
                                VariantType.TUPLE,
                                DBusCallFlags.NONE,
-                               1000,
+                               CALL_TIMEOUT,
                                null, (obj, res) => {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
@@ -90,7 +92,7 @@ public class Viewer.Backend.BusManager : Object {
                                new Variant.tuple (parameters),
                                VariantType.TUPLE,
                                DBusCallFlags.NONE,
-                               1000,
+                               CALL_TIMEOUT,
                                null, (obj, res) => {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
@@ -119,7 +121,7 @@ public class Viewer.Backend.BusManager : Object {
                                new Variant.tuple (parameters),
                                VariantType.TUPLE,
                                DBusCallFlags.NONE,
-                               1000,
+                               CALL_TIMEOUT,
                                null, (obj, res) => {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
@@ -148,7 +150,7 @@ public class Viewer.Backend.BusManager : Object {
                                new Variant.tuple (parameters),
                                VariantType.TUPLE,
                                DBusCallFlags.NONE,
-                               1000,
+                               CALL_TIMEOUT,
                                null, (obj, res) => {
             try {
                 if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
@@ -177,7 +179,7 @@ public class Viewer.Backend.BusManager : Object {
                                new Variant.tuple (parameters),
                                VariantType.TUPLE,
                                DBusCallFlags.NONE,
-                               1000,
+                               CALL_TIMEOUT,
                                null, (obj, res) => {
             try {
                 int streamer_id = connection.call.end (res).get_child_value (0).get_int32 ();

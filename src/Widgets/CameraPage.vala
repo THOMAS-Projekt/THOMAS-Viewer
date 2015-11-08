@@ -17,7 +17,27 @@
  * Boston, MA 02111-1307, USA.
  */
 
-public class Viewer.Widgets.CameraPage : Gtk.Grid {
-    public CameraPage () {
+public class Viewer.Widgets.CameraPage : Gtk.Overlay {
+    public Backend.UDPRenderer renderer { private get; construct; }
+
+    private Gtk.Image frame_view;
+
+    public CameraPage (Backend.UDPRenderer renderer) {
+        Object (renderer: renderer);
+
+        build_ui ();
+        connect_signals ();
+    }
+
+    private void build_ui () {
+        frame_view = new Gtk.Image ();
+
+        this.add (frame_view);
+    }
+
+    private void connect_signals () {
+        renderer.frame_received.connect ((frame) => {
+            frame_view.set_from_pixbuf (frame);
+        });
     }
 }

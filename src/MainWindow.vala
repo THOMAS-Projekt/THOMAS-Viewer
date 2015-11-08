@@ -18,8 +18,11 @@
  */
 
 public class Viewer.MainWindow : Gtk.Window {
+    private static const uint16 CAMERA_STREAMER_PORT = 4243;
+
     private Backend.SettingsManager settings_manager;
     private Backend.BusManager bus_manager;
+    private Backend.UDPRenderer udp_renderer;
 
     private Gtk.HeaderBar header_bar;
 
@@ -41,6 +44,7 @@ public class Viewer.MainWindow : Gtk.Window {
 
         settings_manager = new Backend.SettingsManager ();
         bus_manager = new Backend.BusManager (settings_manager);
+        udp_renderer = new Backend.UDPRenderer (CAMERA_STREAMER_PORT);
 
         configure_gtk ();
         build_ui ();
@@ -71,7 +75,7 @@ public class Viewer.MainWindow : Gtk.Window {
         stack = new Gtk.Stack ();
 
         configuration_page = new Widgets.ConfigurationPage (settings_manager, bus_manager);
-        camera_page = new Widgets.CameraPage ();
+        camera_page = new Widgets.CameraPage (udp_renderer);
 
         stack.add_titled (configuration_page, "configuration", "Konfiguration");
         stack.add_titled (camera_page, "camera", "Kamera");
@@ -106,6 +110,14 @@ public class Viewer.MainWindow : Gtk.Window {
             warning ("Zugriffsfehler: %s", message);
 
             /* TODO: Warnung grafisch anzeigen. */
+        });
+
+        stack.notify["visible-child-name"].connect (() => {
+            if (stack.visible_child_name == "camera") {
+                bus_manager.start_camera_stream (Environment.get_host_name (), CAMERA_STREAMER_PORT);
+            }
+
+            /* TODO: Kameraübertragung beim Verlassen der Kamera-Seite stoppen. */
         });
 
         side_bar_toggle.clicked.connect (() => {

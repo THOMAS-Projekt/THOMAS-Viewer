@@ -9,6 +9,7 @@ vala_precompile (VALA_C
     Widgets/SideBar.vala
     Backend/SettingsManager.vala
     Backend/BusManager.vala
+    Backend/UDPRenderer.vala
 PACKAGES
     gtk+-3.0
     gio-2.0
