@@ -9,6 +9,10 @@
 			<default>''</default>
 			<summary>Die Adresse des zuletzt verwendeten Hosts</summary>
 		</key>
+		<key type="s" name="own-host">
+			<default>''</default>
+			<summary>Die Adresse des eigenen Computers. Leer lassen um den Hostnamen automatisch zu bestimmen.</summary>
+		</key>
 		<key type="b" name="auto-resize">
 			<default>true</default>
 			<summary>Das Kamerabild automatisch an die Fenstergröße anpassen</summary>

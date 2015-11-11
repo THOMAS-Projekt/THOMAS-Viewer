@@ -20,6 +20,7 @@
 public class Viewer.Backend.SettingsManager : Granite.Services.Settings {
     public bool show_side_bar { get; set; default = true; }
     public string last_host { get; set; default = ""; }
+    public string own_host { get; set; default = ""; }
     public bool auto_resize { get; set; default = true; }
     public int stream_quality { get; set; default = 70; }
 

@@ -22,6 +22,7 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
     public Backend.BusManager bus_manager { private get; construct; }
 
     private Gtk.Entry host_entry;
+    private Gtk.Entry own_host_entry;
 
     private int rows = 0;
 
@@ -42,7 +43,12 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
         host_entry = new Gtk.Entry ();
         host_entry.text = settings_manager.last_host;
 
+        own_host_entry = new Gtk.Entry ();
+        own_host_entry.text = settings_manager.own_host;
+        own_host_entry.placeholder_text = Environment.get_host_name ();
+
         add_entry ("Server-Adresse:", host_entry);
+        add_entry ("Eigene Adresse:", own_host_entry);
     }
 
     private void add_entry (string title, Gtk.Widget widget) {
@@ -58,10 +64,13 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
 
     private void connect_signals () {
         host_entry.changed.connect (() => {
-            string new_host = host_entry.text;
+            settings_manager.last_host = host_entry.text;
 
-            settings_manager.last_host = new_host;
             bus_manager.invalidate_connection ();
+        });
+
+        own_host_entry.changed.connect (() => {
+            settings_manager.own_host = own_host_entry.text;
         });
     }
 }

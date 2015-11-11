@@ -182,7 +182,9 @@ public class Viewer.MainWindow : Gtk.Window {
             return;
         }
 
-        bus_manager.start_camera_stream.begin (Environment.get_host_name (), CAMERA_STREAMER_PORT, (obj, res) => {
+        string own_host = settings_manager.own_host.strip () == "" ? Environment.get_host_name () : settings_manager.own_host;
+
+        bus_manager.start_camera_stream.begin (own_host, CAMERA_STREAMER_PORT, (obj, res) => {
             camera_streamer_id = bus_manager.start_camera_stream.end (res);
 
             bus_manager.set_camera_stream_options (camera_streamer_id, settings_manager.stream_quality, settings_manager.stream_quality);
