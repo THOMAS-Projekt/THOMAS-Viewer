@@ -23,6 +23,7 @@ public class Viewer.MainWindow : Gtk.Window {
     private Backend.SettingsManager settings_manager;
     private Backend.BusManager bus_manager;
     private Backend.UDPRenderer udp_renderer;
+    private Backend.JoystickManager joystick_manager;
 
     private Gtk.HeaderBar header_bar;
 
@@ -53,6 +54,7 @@ public class Viewer.MainWindow : Gtk.Window {
         settings_manager = new Backend.SettingsManager ();
         bus_manager = new Backend.BusManager (settings_manager);
         udp_renderer = new Backend.UDPRenderer (CAMERA_STREAMER_PORT);
+        joystick_manager = new Backend.JoystickManager (bus_manager);
 
         configure_gtk ();
         build_ui ();
@@ -94,7 +96,7 @@ public class Viewer.MainWindow : Gtk.Window {
 
         stack = new Gtk.Stack ();
 
-        configuration_page = new Widgets.ConfigurationPage (settings_manager, bus_manager);
+        configuration_page = new Widgets.ConfigurationPage (settings_manager, bus_manager, joystick_manager);
         camera_page = new Widgets.CameraPage (settings_manager, udp_renderer);
 
         stack.add_titled (configuration_page, "configuration", "Konfiguration");

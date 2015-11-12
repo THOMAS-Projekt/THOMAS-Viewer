@@ -10,11 +10,16 @@ vala_precompile (VALA_C
     Backend/SettingsManager.vala
     Backend/BusManager.vala
     Backend/UDPRenderer.vala
+    Backend/Joystick.vala
+    Backend/JoystickManager.vala
 PACKAGES
     gtk+-3.0
     gio-2.0
     granite
+    posix
+    linux-joystick
 OPTIONS
+    --vapidir=${CMAKE_SOURCE_DIR}/vapi/
     --thread
     --target-glib=2.32
 )
