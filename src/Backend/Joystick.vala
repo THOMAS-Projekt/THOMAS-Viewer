@@ -18,6 +18,9 @@
  */
 
 public class Viewer.Backend.Joystick : Object {
+    public static const int MAX_AXIS_VALUE = short.MAX;
+    public static const int AXIS_TOLERANCE = MAX_AXIS_VALUE / 10;
+
     /* Alle Button-IDs der Joysticks */
     public enum Button {
         SIDEWINDER_BUTTON_FIRE = 0,
@@ -51,7 +54,7 @@ public class Viewer.Backend.Joystick : Object {
 
     /* Alle Achsen-IDs der Joysticks */
     public enum Axis {
-        SIDEWINDER_AXIS_WEAST_EAST = 0,
+        SIDEWINDER_AXIS_WEST_EAST = 0,
         SIDEWINDER_AXIS_NORTH_SOUTH = 1,
         SIDEWINDER_AXIS_ROTATION = 2,
         SIDEWINDER_AXIS_SCROLL_WHEEL = 3,

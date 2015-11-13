@@ -20,10 +20,17 @@
 public class Viewer.Backend.JoystickManager : Object {
     private static const string INPUT_DEVICE_DIRECTORY = "/dev/input/";
 
+    private static const int MAX_MOTOR_SPEED = 255;
+    private static const double JOYSTICK_SPEED_CONVERSION_FACTOR = (double)MAX_MOTOR_SPEED / Joystick.MAX_AXIS_VALUE;
+
     public BusManager bus_manager{ private get; construct; }
 
     private Gee.HashMap<string, Joystick> joysticks;
     private Joystick? selected_joystick = null;
+
+    private int axis_north_south_value = 0;
+    private int axis_west_east_value = 0;
+    private int axis_rotation_value = 0;
 
     public JoystickManager (BusManager bus_manager) {
         Object (bus_manager : bus_manager);
@@ -104,9 +111,52 @@ public class Viewer.Backend.JoystickManager : Object {
         switch (axis_hash) {
             case Joystick.Axis.SIDEWINDER_AXIS_NORTH_SOUTH :
             case Joystick.Axis.XBOX_AXIS_TOP_NORTH_SOUTH :
-                bus_manager.accelerate_to_motor_speed (BusManager.Motor.BOTH, axis_value / (-128));
+                axis_north_south_value = axis_value;
 
                 break;
+
+            case Joystick.Axis.SIDEWINDER_AXIS_WEST_EAST:
+            case Joystick.Axis.XBOX_AXIS_TOP_WEST_EAST:
+                axis_west_east_value = axis_value;
+
+                break;
+
+            case Joystick.Axis.SIDEWINDER_AXIS_ROTATION:
+                axis_rotation_value = axis_value;
+
+                break;
+
+            default:
+
+                return;
         }
+
+        /* Die neuen Geschwindigkeitswerte */
+        int speed_left = 0, speed_right = 0;
+
+        /* Prüfen, ob eine nennenswerte Achsenbewegung eintrat, ansonsten (wenn vorhanden) mit Hilfe der R-Achse drehen */
+        if (axis_north_south_value.abs () >= Joystick.AXIS_TOLERANCE || axis_west_east_value.abs () >= Joystick.AXIS_TOLERANCE) {
+            /* Summe der Achsauslenkungen berechnen */
+            int axis_sum = axis_north_south_value.abs () + axis_west_east_value.abs ();
+
+            /* Prüfen, ob die Joystickauslenkung innerhalb des steuerungsbereiches liegt */
+            if (axis_sum <= Joystick.MAX_AXIS_VALUE) {
+                /* Geschwindigkeiten berechnen */
+                speed_left = -(int)(JOYSTICK_SPEED_CONVERSION_FACTOR * (-axis_west_east_value + axis_north_south_value));
+                speed_right = -(int)(JOYSTICK_SPEED_CONVERSION_FACTOR * (axis_west_east_value + axis_north_south_value));
+            } else {
+                /* Auslenkungswerte reduzieren und Geschwindigkeiten berechnen */
+                speed_left = -(int)(((double)MAX_MOTOR_SPEED / axis_sum) * (-axis_west_east_value + axis_north_south_value));
+                speed_right = -(int)(((double)MAX_MOTOR_SPEED / axis_sum) * (axis_west_east_value + axis_north_south_value));
+            }
+        } else {
+            /* Geschwindigkeit für Drehung um eigene Achse berechnen */
+            speed_left = (int)(JOYSTICK_SPEED_CONVERSION_FACTOR * axis_rotation_value);
+            speed_right = -(int)(JOYSTICK_SPEED_CONVERSION_FACTOR * axis_rotation_value);
+        }
+
+        /* Geschwindigkeiten senden */
+        bus_manager.accelerate_to_motor_speed (BusManager.Motor.LEFT, speed_left);
+        bus_manager.accelerate_to_motor_speed (BusManager.Motor.RIGHT, speed_right);
     }
 }
