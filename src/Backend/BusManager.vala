@@ -35,6 +35,11 @@ public class Viewer.Backend.BusManager : Object {
     public signal void action_failure (string message);
     public signal void action_success ();
 
+    public signal void cpu_load_changed (double cpu_load);
+    public signal void memory_usage_changed (double memory_usage);
+    public signal void net_load_changed (uint64 bytes_in, uint64 bytes_out);
+    public signal void free_drive_space_changed (int megabytes);
+
     public SettingsManager settings_manager { private get; construct; }
 
     private DBusConnection? connection = null;
@@ -291,6 +296,34 @@ public class Viewer.Backend.BusManager : Object {
         try {
             connection = new DBusConnection.for_address_sync ("tcp:host=%s,port=4242".printf (settings_manager.last_host),
                                                               DBusConnectionFlags.AUTHENTICATION_CLIENT);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "CpuLoadChanged",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_cpu_load_changed);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "MemoryUsageChanged",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_memory_usage_changed);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "NetLoadChanged",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_net_load_changed);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "FreeDriveSpaceChanged",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_free_drive_space_changed);
         } catch (Error e) {
             warning ("Herstellen der DBus-Verbindung fehlgeschlagen: %s", e.message);
             connection_failure (e.message);
@@ -302,5 +335,42 @@ public class Viewer.Backend.BusManager : Object {
 
         /* Nur um nochmals sicherzugehen */
         return (connection != null && !connection.closed);
+    }
+
+    private void on_cpu_load_changed (DBusConnection connection,
+                                      string ? sender_name,
+                                      string object_path,
+                                      string interface_name,
+                                      string signal_name,
+                                      Variant paramerers) {
+        cpu_load_changed (paramerers.get_child_value (0).get_double ());
+    }
+
+    private void on_memory_usage_changed (DBusConnection connection,
+                                          string ? sender_name,
+                                          string object_path,
+                                          string interface_name,
+                                          string signal_name,
+                                          Variant paramerers) {
+        memory_usage_changed (paramerers.get_child_value (0).get_double ());
+    }
+
+    private void on_net_load_changed (DBusConnection connection,
+                                      string ? sender_name,
+                                      string object_path,
+                                      string interface_name,
+                                      string signal_name,
+                                      Variant paramerers) {
+        net_load_changed (paramerers.get_child_value (0).get_uint64 (),
+                          paramerers.get_child_value (1).get_uint64 ());
+    }
+
+    private void on_free_drive_space_changed (DBusConnection connection,
+                                              string ? sender_name,
+                                              string object_path,
+                                              string interface_name,
+                                              string signal_name,
+                                              Variant paramerers) {
+        free_drive_space_changed (paramerers.get_child_value (0).get_int32 ());
     }
 }

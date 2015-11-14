@@ -115,7 +115,7 @@ public class Viewer.MainWindow : Gtk.Window {
         stack.add_titled (configuration_page, "configuration", "Konfiguration");
         stack.add_titled (camera_page, "camera", "Kamera");
 
-        side_bar = new Widgets.SideBar ();
+        side_bar = new Widgets.SideBar (bus_manager);
         side_bar.no_show_all = true;
 
         stack_switcher.stack = stack;

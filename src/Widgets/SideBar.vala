@@ -18,10 +18,16 @@
  */
 
 public class Viewer.Widgets.SideBar : Gtk.Grid {
-    public SideBar () {
-        this.add (new Gtk.Label ("BLA"));
+    public Backend.BusManager bus_manager { private get; construct; }
 
+    public SideBar (Backend.BusManager bus_manager) {
+        Object (bus_manager: bus_manager);
+
+        build_ui ();
         connect_signals ();
+    }
+
+    private void build_ui () {
     }
 
     private void connect_signals () {
