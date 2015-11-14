@@ -30,7 +30,7 @@ include (ValaPrecompile)
 find_package (PkgConfig)
 pkg_check_modules (DEPS REQUIRED granite gtk+-3.0 gthread-2.0 gio-2.0)
 add_definitions (${DEPS_CFLAGS})
-link_libraries (${DEPS_LIBRARIES})
+link_libraries (${DEPS_LIBRARIES} -lm)
 link_directories (${DEPS_LIBRARY_DIRS})
 
 # Unterverzeichnisse einbeziehen

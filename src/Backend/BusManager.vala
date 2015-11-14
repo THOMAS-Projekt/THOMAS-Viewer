@@ -38,6 +38,9 @@ public class Viewer.Backend.BusManager : Object {
     public signal void net_load_changed (uint64 bytes_in, uint64 bytes_out);
     public signal void free_drive_space_changed (int megabytes);
 
+    public signal void map_scan_continued (int map_id, uint8 angle, uint16[] step_distances);
+    public signal void map_scan_finished (int map_id);
+
     public SettingsManager settings_manager { private get; construct; }
 
     private DBusConnection? connection = null;
@@ -318,6 +321,36 @@ public class Viewer.Backend.BusManager : Object {
         return map_id;
     }
 
+    public void stop_scan (int map_id) {
+        if (!validate_connection ()) {
+            return;
+        }
+
+        Variant[] parameters = {
+            new Variant.int32 (map_id)
+        };
+
+        connection.call.begin (null,
+                               SERVER_PATH,
+                               SERVER_NAME,
+                               "StopScan",
+                               new Variant.tuple (parameters),
+                               VariantType.TUPLE,
+                               DBusCallFlags.NONE,
+                               CALL_TIMEOUT,
+                               null, (obj, res) => {
+            try {
+                if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
+                    action_failure ("Ein Zugriff auf den Distanzsensor wird nicht unterstützt.");
+                } else {
+                    action_success ();
+                }
+            } catch (Error e) {
+                connection_failure (e.message);
+            }
+        });
+    }
+
     private bool validate_connection () {
         if (connection != null && !connection.closed) {
             return true;
@@ -356,6 +389,20 @@ public class Viewer.Backend.BusManager : Object {
                                          null,
                                          DBusSignalFlags.NONE,
                                          on_free_drive_space_changed);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "MapScanContinued",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_map_scan_continued);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "MapScanFinished",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_map_scan_finished);
         } catch (Error e) {
             warning ("Herstellen der DBus-Verbindung fehlgeschlagen: %s", e.message);
             connection_failure (e.message);
@@ -404,5 +451,32 @@ public class Viewer.Backend.BusManager : Object {
                                               string signal_name,
                                               Variant paramerers) {
         free_drive_space_changed (paramerers.get_child_value (0).get_int32 ());
+    }
+
+    private void on_map_scan_continued (DBusConnection connection,
+                                        string ? sender_name,
+                                        string object_path,
+                                        string interface_name,
+                                        string signal_name,
+                                        Variant paramerers) {
+        Variant distance_array = paramerers.get_child_value (2);
+        uint16[] step_distances = {};
+
+        for (int i = 0; i < distance_array.n_children (); i++) {
+            step_distances += distance_array.get_child_value (i).get_uint16 ();
+        }
+
+        map_scan_continued (paramerers.get_child_value (0).get_int32 (),
+                            paramerers.get_child_value (1).get_byte (),
+                            step_distances);
+    }
+
+    private void on_map_scan_finished (DBusConnection connection,
+                                       string ? sender_name,
+                                       string object_path,
+                                       string interface_name,
+                                       string signal_name,
+                                       Variant paramerers) {
+        map_scan_finished (paramerers.get_child_value (0).get_int32 ());
     }
 }

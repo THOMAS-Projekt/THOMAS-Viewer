@@ -23,8 +23,12 @@ public class Viewer.Widgets.MapsPage : Gtk.Stack {
     private Granite.Widgets.Welcome welcome_screen;
     private Granite.Widgets.DynamicNotebook notebook;
 
+    private Gee.HashMap<int, MapTab> maps;
+
     public MapsPage (Backend.BusManager bus_manager) {
         Object (bus_manager: bus_manager);
+
+        maps = new Gee.HashMap<int, MapTab> ();
 
         build_ui ();
         connect_signals ();
@@ -42,6 +46,22 @@ public class Viewer.Widgets.MapsPage : Gtk.Stack {
     }
 
     private void connect_signals () {
+        bus_manager.map_scan_continued.connect ((map_id, angle, distances) => {
+            if (!maps.has_key (map_id)) {
+                return;
+            }
+
+            maps.@get (map_id).add_distances (angle, distances);
+        });
+
+        bus_manager.map_scan_finished.connect ((map_id) => {
+            if (!maps.has_key (map_id)) {
+                return;
+            }
+
+            maps.@get (map_id).working = false;
+        });
+
         welcome_screen.activated.connect ((index) => {
             if (index == 0) {
                 start_new_scan ();
@@ -49,6 +69,16 @@ public class Viewer.Widgets.MapsPage : Gtk.Stack {
         });
 
         notebook.new_tab_requested.connect (start_new_scan);
+        notebook.tab_removed.connect ((tab) => {
+            MapTab? map_tab = (tab as MapTab);
+
+            if (map_tab == null) {
+                return;
+            }
+
+            bus_manager.stop_scan (map_tab.map_id);
+            maps.unset (map_tab.map_id);
+        });
     }
 
     private void start_new_scan () {
@@ -59,8 +89,10 @@ public class Viewer.Widgets.MapsPage : Gtk.Stack {
                 return;
             }
 
-            MapTab map_tab = new MapTab ("Karte %i".printf (map_id));
+            MapTab map_tab = new MapTab (map_id, "Karte %i".printf (map_id));
+            map_tab.working = true;
 
+            maps.@set (map_id, map_tab);
             notebook.insert_tab (map_tab, -1);
 
             this.set_visible_child_name ("notebook");
