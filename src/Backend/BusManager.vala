@@ -29,7 +29,8 @@ public class Viewer.Backend.BusManager : Object {
         BOTH = 3
     }
 
-    public signal void stream_registered (int streamer_id);
+    private signal void stream_registered (int streamer_id);
+    public signal void distance_map_registered (int map_id);
 
     public signal void connection_failure (string message);
     public signal void action_failure (string message);
@@ -284,6 +285,42 @@ public class Viewer.Backend.BusManager : Object {
                 connection_failure (e.message);
             }
         });
+    }
+
+    public async int start_new_scan () {
+        if (!validate_connection ()) {
+            return -1;
+        }
+
+        int map_id = -1;
+
+        connection.call.begin (null,
+                               SERVER_PATH,
+                               SERVER_NAME,
+                               "StartNewScan",
+                               null,
+                               VariantType.TUPLE,
+                               DBusCallFlags.NONE,
+                               CALL_TIMEOUT,
+                               null, (obj, res) => {
+            try {
+                map_id = connection.call.end (res).get_child_value (0).get_int32 ();
+
+                if (map_id < 0) {
+                    action_failure ("Ein Zugriff auf den Distanzsensor wird nicht unterstützt.");
+                } else {
+                    distance_map_registered (map_id);
+                    action_success ();
+                }
+            } catch (Error e) {
+                connection_failure (e.message);
+            }
+
+            start_new_scan.callback ();
+        });
+        yield;
+
+        return map_id;
     }
 
     private bool validate_connection () {

@@ -6,6 +6,8 @@ vala_precompile (VALA_C
     MainWindow.vala
     Widgets/ConfigurationPage.vala
     Widgets/CameraPage.vala
+    Widgets/MapsPage.vala
+    Widgets/MapTab.vala
     Widgets/SideBar.vala
     Backend/SettingsManager.vala
     Backend/BusManager.vala

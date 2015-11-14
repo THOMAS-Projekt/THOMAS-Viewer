@@ -44,6 +44,7 @@ public class Viewer.MainWindow : Gtk.Window {
 
     private Widgets.ConfigurationPage configuration_page;
     private Widgets.CameraPage camera_page;
+    private Widgets.MapsPage maps_page;
 
     private Widgets.SideBar side_bar;
 
@@ -111,9 +112,11 @@ public class Viewer.MainWindow : Gtk.Window {
 
         configuration_page = new Widgets.ConfigurationPage (settings_manager, bus_manager, joystick_manager);
         camera_page = new Widgets.CameraPage (settings_manager, udp_renderer);
+        maps_page = new Widgets.MapsPage (bus_manager);
 
         stack.add_titled (configuration_page, "configuration", "Konfiguration");
         stack.add_titled (camera_page, "camera", "Kamera");
+        stack.add_titled (maps_page, "maps", "Karten");
 
         side_bar = new Widgets.SideBar (bus_manager);
         side_bar.no_show_all = true;
