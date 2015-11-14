@@ -29,9 +29,6 @@ public class Viewer.Backend.BusManager : Object {
         BOTH = 3
     }
 
-    private signal void stream_registered (int streamer_id);
-    public signal void distance_map_registered (int map_id);
-
     public signal void connection_failure (string message);
     public signal void action_failure (string message);
     public signal void action_success ();
@@ -211,7 +208,6 @@ public class Viewer.Backend.BusManager : Object {
                 if (streamer_id < 0) {
                     action_failure ("Ein Zugriff auf die Kamera wird nicht unterstützt.");
                 } else {
-                    stream_registered (streamer_id);
                     action_success ();
                 }
             } catch (Error e) {
@@ -309,7 +305,6 @@ public class Viewer.Backend.BusManager : Object {
                 if (map_id < 0) {
                     action_failure ("Ein Zugriff auf den Distanzsensor wird nicht unterstützt.");
                 } else {
-                    distance_map_registered (map_id);
                     action_success ();
                 }
             } catch (Error e) {
