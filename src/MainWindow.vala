@@ -52,10 +52,12 @@ public class Viewer.MainWindow : Gtk.Window {
     /* Die ID des aktuell laufenden Kamerastreames. */
     private int camera_streamer_id = -1;
 
+    /* Zustandsvariablen für die Analyse der Tastendrücke */
     private bool key_up_pressed = false;
     private bool key_down_pressed = false;
     private bool key_left_pressed = false;
     private bool key_right_pressed = false;
+    private bool key_space_pressed = false;
 
     public MainWindow (Viewer.Application application) {
         this.set_application (application);
@@ -142,6 +144,11 @@ public class Viewer.MainWindow : Gtk.Window {
         });
 
         this.key_press_event.connect ((event) => {
+            /* Tastendrücke im Steuerungsfenster ignorieren */
+            if (stack.visible_child_name == "configuration") {
+                return Gdk.EVENT_PROPAGATE;
+            }
+
             switch (event.keyval) {
                 case Gdk.Key.F11:
                     toggle_fullscreen ();
@@ -152,6 +159,7 @@ public class Viewer.MainWindow : Gtk.Window {
                 case Gdk.Key.Down: key_down_pressed = true; break;
                 case Gdk.Key.Left: key_left_pressed = true; break;
                 case Gdk.Key.Right: key_right_pressed = true; break;
+                case Gdk.Key.space: key_space_pressed = true; break;
 
                 default:
 
@@ -164,11 +172,17 @@ public class Viewer.MainWindow : Gtk.Window {
         });
 
         this.key_release_event.connect ((event) => {
+            /* Tastendrücke im Steuerungsfenster ignorieren */
+            if (stack.visible_child_name == "configuration") {
+                return Gdk.EVENT_PROPAGATE;
+            }
+
             switch (event.keyval) {
                 case Gdk.Key.Up: key_up_pressed = false; break;
                 case Gdk.Key.Down: key_down_pressed = false; break;
                 case Gdk.Key.Left: key_left_pressed = false; break;
                 case Gdk.Key.Right: key_right_pressed = false; break;
+                case Gdk.Key.space: key_space_pressed = false; break;
 
                 default:
 
@@ -232,30 +246,37 @@ public class Viewer.MainWindow : Gtk.Window {
     }
 
     private void process_key_control () {
-        int speed_left = 0, speed_right = 0;
+        /* Leertaste soll als Stopp-Taste agieren */
+        if (key_space_pressed) {
+            /* Sofort anhalten */
+            bus_manager.set_motor_speed (Backend.BusManager.Motor.BOTH, 0);
+        } else {
+            int speed_left = 0, speed_right = 0;
 
-        /* Geschwindigkeitswerte für einfache Tastendrücke setzen */
-        if (key_up_pressed) {
-            speed_left = (speed_right = KEY_CONTROL_MOTOR_SPEED);
-        } else if (key_down_pressed) {
-            speed_left = (speed_right = -KEY_CONTROL_MOTOR_SPEED);
-        } else if (key_left_pressed) {
-            speed_left = -(speed_right = KEY_CONTROL_MOTOR_SPEED);
-        } else if (key_right_pressed) {
-            speed_left = -(speed_right = -KEY_CONTROL_MOTOR_SPEED);
+            /* Geschwindigkeitswerte für einfache Tastendrücke setzen */
+            if (key_up_pressed) {
+                speed_left = (speed_right = KEY_CONTROL_MOTOR_SPEED);
+            } else if (key_down_pressed) {
+                speed_left = (speed_right = -KEY_CONTROL_MOTOR_SPEED);
+            } else if (key_left_pressed) {
+                speed_left = -(speed_right = KEY_CONTROL_MOTOR_SPEED);
+            } else if (key_right_pressed) {
+                speed_left = -(speed_right = -KEY_CONTROL_MOTOR_SPEED);
+            }
+
+            /* Geschwindigkeitswerte bei doppelten Tastendrücken korrigieren */
+            if ((key_up_pressed || key_down_pressed) && key_left_pressed) {
+                speed_left = 0;
+            }
+
+            if ((key_up_pressed || key_down_pressed) && key_right_pressed) {
+                speed_right = 0;
+            }
+
+            /* Neue Geschwindigkeitswerte senden */
+            bus_manager.accelerate_to_motor_speed (Backend.BusManager.Motor.LEFT, speed_left);
+            bus_manager.accelerate_to_motor_speed (Backend.BusManager.Motor.RIGHT, speed_right);
         }
-
-        /* Geschwindigkeitswerte bei doppelten Tastendrücken korrigieren */
-        if ((key_up_pressed || key_down_pressed) && key_left_pressed) {
-            speed_left = 0;
-        }
-
-        if ((key_up_pressed || key_down_pressed) && key_right_pressed) {
-            speed_right = 0;
-        }
-
-        bus_manager.accelerate_to_motor_speed (Backend.BusManager.Motor.LEFT, speed_left);
-        bus_manager.accelerate_to_motor_speed (Backend.BusManager.Motor.RIGHT, speed_right);
     }
 
     private void show_info_bar (Gtk.MessageType message_type, string message) {
