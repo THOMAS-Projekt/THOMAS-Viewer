@@ -20,6 +20,8 @@
 public class Viewer.MainWindow : Gtk.Window {
     private static const uint16 CAMERA_STREAMER_PORT = 4243;
 
+    private static const int KEY_CONTROL_MOTOR_SPEED = 255;
+
     private Backend.SettingsManager settings_manager;
     private Backend.BusManager bus_manager;
     private Backend.UDPRenderer udp_renderer;
@@ -45,8 +47,15 @@ public class Viewer.MainWindow : Gtk.Window {
 
     private Widgets.SideBar side_bar;
 
+    private bool is_fullscreened = false;
+
     /* Die ID des aktuell laufenden Kamerastreames. */
     private int camera_streamer_id = -1;
+
+    private bool key_up_pressed = false;
+    private bool key_down_pressed = false;
+    private bool key_left_pressed = false;
+    private bool key_right_pressed = false;
 
     public MainWindow (Viewer.Application application) {
         this.set_application (application);
@@ -68,6 +77,8 @@ public class Viewer.MainWindow : Gtk.Window {
 
     private void build_ui () {
         this.set_default_size (1000, 700);
+        this.events |= Gdk.EventMask.KEY_PRESS_MASK |
+                       Gdk.EventMask.KEY_RELEASE_MASK;
 
         header_bar = new Gtk.HeaderBar ();
         header_bar.show_close_button = true;
@@ -130,6 +141,45 @@ public class Viewer.MainWindow : Gtk.Window {
             info_bar.hide ();
         });
 
+        this.key_press_event.connect ((event) => {
+            switch (event.keyval) {
+                case Gdk.Key.F11:
+                    toggle_fullscreen ();
+
+                    break;
+
+                case Gdk.Key.Up: key_up_pressed = true; break;
+                case Gdk.Key.Down: key_down_pressed = true; break;
+                case Gdk.Key.Left: key_left_pressed = true; break;
+                case Gdk.Key.Right: key_right_pressed = true; break;
+
+                default:
+
+                    return Gdk.EVENT_PROPAGATE;
+            }
+
+            process_key_control ();
+
+            return Gdk.EVENT_STOP;
+        });
+
+        this.key_release_event.connect ((event) => {
+            switch (event.keyval) {
+                case Gdk.Key.Up: key_up_pressed = false; break;
+                case Gdk.Key.Down: key_down_pressed = false; break;
+                case Gdk.Key.Left: key_left_pressed = false; break;
+                case Gdk.Key.Right: key_right_pressed = false; break;
+
+                default:
+
+                    return Gdk.EVENT_PROPAGATE;
+            }
+
+            process_key_control ();
+
+            return Gdk.EVENT_STOP;
+        });
+
         bus_manager.connection_failure.connect ((message) => {
             warning ("Verbindungsfehler: %s", message);
 
@@ -169,6 +219,43 @@ public class Viewer.MainWindow : Gtk.Window {
 
             bus_manager.set_camera_stream_options (camera_streamer_id, stream_quality, stream_quality);
         });
+    }
+
+    private void toggle_fullscreen () {
+        if (is_fullscreened) {
+            this.unfullscreen ();
+        } else {
+            this.fullscreen ();
+        }
+
+        is_fullscreened = !is_fullscreened;
+    }
+
+    private void process_key_control () {
+        int speed_left = 0, speed_right = 0;
+
+        /* Geschwindigkeitswerte für einfache Tastendrücke setzen */
+        if (key_up_pressed) {
+            speed_left = (speed_right = KEY_CONTROL_MOTOR_SPEED);
+        } else if (key_down_pressed) {
+            speed_left = (speed_right = -KEY_CONTROL_MOTOR_SPEED);
+        } else if (key_left_pressed) {
+            speed_left = -(speed_right = KEY_CONTROL_MOTOR_SPEED);
+        } else if (key_right_pressed) {
+            speed_left = -(speed_right = -KEY_CONTROL_MOTOR_SPEED);
+        }
+
+        /* Geschwindigkeitswerte bei doppelten Tastendrücken korrigieren */
+        if ((key_up_pressed || key_down_pressed) && key_left_pressed) {
+            speed_left = 0;
+        }
+
+        if ((key_up_pressed || key_down_pressed) && key_right_pressed) {
+            speed_right = 0;
+        }
+
+        bus_manager.accelerate_to_motor_speed (Backend.BusManager.Motor.LEFT, speed_left);
+        bus_manager.accelerate_to_motor_speed (Backend.BusManager.Motor.RIGHT, speed_right);
     }
 
     private void show_info_bar (Gtk.MessageType message_type, string message) {
