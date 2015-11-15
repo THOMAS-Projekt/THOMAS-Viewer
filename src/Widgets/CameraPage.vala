@@ -121,6 +121,10 @@ public class Viewer.Widgets.CameraPage : Gtk.Overlay {
         });
     }
 
+    /*
+     * Wird durch das Signal aus einem seperaten Thread heraus aufgerufen,
+     * daher müssen GUI-Zugriffe in die MainLoop zurückverschoben werden.
+     */
     private void display_frame (Gdk.Pixbuf frame) {
         if (settings_manager.auto_resize) {
             int new_width, new_height;
@@ -132,11 +136,20 @@ public class Viewer.Widgets.CameraPage : Gtk.Overlay {
                                out new_width,
                                out new_height);
 
-            Gdk.Pixbuf scaled_frame = frame.scale_simple (new_width, new_height, Gdk.InterpType.BILINEAR);
+            Gdk.Pixbuf scaled_frame = frame.scale_simple (new_width, new_height, Gdk.InterpType.NEAREST);
 
-            frame_view.set_from_pixbuf (scaled_frame);
+            Idle.add (() => {
+                frame_view.set_from_pixbuf (scaled_frame);
+                debug ("update");
+
+                return false;
+            });
         } else {
-            frame_view.set_from_pixbuf (frame);
+            Idle.add (() => {
+                frame_view.set_from_pixbuf (frame);
+
+                return false;
+            });
         }
     }
 

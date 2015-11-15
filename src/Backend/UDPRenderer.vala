@@ -20,6 +20,7 @@
 public class Viewer.Backend.UDPRenderer : Object {
     private static const uint32 MAX_PACKAGE_SIZE = 64000;
 
+    /* Vorsicht: Läuft in eigenem Thread. */
     public signal void frame_received (Gdk.Pixbuf frame);
 
     private Socket udp_socket;
@@ -51,13 +52,25 @@ public class Viewer.Backend.UDPRenderer : Object {
 
                 /* Paket vollständig? */
                 if (package_length < MAX_PACKAGE_SIZE) {
-                    frame_loader.close ();
+                    /* Instanz des Loaders für Verarbeitung in eigenem Thread sichern. */
+                    Gdk.PixbufLoader current_loader = frame_loader;
 
-                    Gdk.Pixbuf? frame = frame_loader.get_pixbuf ();
+                    /* Verarbeitung aus Performancegründen in eienen Thread auslagern. */
+                    new Thread<int> (null, () => {
+                        try {
+                            current_loader.close ();
 
-                    if (frame != null) {
-                        frame_received (frame);
-                    }
+                            Gdk.Pixbuf? frame = current_loader.get_pixbuf ();
+
+                            if (frame != null) {
+                                frame_received (frame);
+                            }
+                        } catch (Error e) {
+                            warning ("Fehler beim Verarbeiten eines Frames: %s", e.message);
+                        }
+
+                        return 0;
+                    });
 
                     frame_loader = new Gdk.PixbufLoader ();
                 }
