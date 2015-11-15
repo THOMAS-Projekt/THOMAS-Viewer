@@ -19,7 +19,7 @@
 
 public class Viewer.Backend.Joystick : Object {
     public static const int MAX_AXIS_VALUE = short.MAX;
-    public static const int AXIS_TOLERANCE = MAX_AXIS_VALUE / 10;
+    public static const int AXIS_TOLERANCE = 0;
 
     /* Alle Button-IDs der Joysticks */
     public enum Button {
