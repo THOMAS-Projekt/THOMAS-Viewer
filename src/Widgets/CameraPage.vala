@@ -25,6 +25,8 @@ public class Viewer.Widgets.CameraPage : Gtk.Overlay {
 
     private Gtk.Image frame_view;
 
+    private Gtk.Revealer loading_revealer;
+
     private Gtk.Revealer action_revealer;
     private Gtk.ActionBar action_bar;
 
@@ -43,12 +45,24 @@ public class Viewer.Widgets.CameraPage : Gtk.Overlay {
         connect_signals ();
     }
 
+    public void reset () {
+        loading_revealer.set_reveal_child (true);
+        frame_view.clear ();
+    }
+
     private void build_ui () {
         this.events |= Gdk.EventMask.POINTER_MOTION_MASK |
                        Gdk.EventMask.LEAVE_NOTIFY_MASK |
                        Gdk.EventMask.ENTER_NOTIFY_MASK;
 
         frame_view = new Gtk.Image ();
+
+        loading_revealer = new Gtk.Revealer ();
+        loading_revealer.transition_type = Gtk.RevealerTransitionType.CROSSFADE;
+        loading_revealer.transition_duration = 600;
+        loading_revealer.reveal_child = true;
+
+        loading_revealer.add (create_loading_view ());
 
         action_revealer = new Gtk.Revealer ();
         action_revealer.transition_type = Gtk.RevealerTransitionType.CROSSFADE;
@@ -86,7 +100,23 @@ public class Viewer.Widgets.CameraPage : Gtk.Overlay {
          * damit sich dessen Größe nicht auf die Fenstergröße auswirkt.
          */
         this.add_overlay (frame_view);
+        this.add_overlay (loading_revealer);
         this.add_overlay (action_revealer);
+    }
+
+    private Gtk.Box create_loading_view () {
+        Gtk.Box loading_container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        loading_container.override_background_color (Gtk.StateFlags.NORMAL, { 0, 0, 0, 255 });
+        loading_container.opacity = 0.9;
+
+        Gtk.Spinner spinner = new Gtk.Spinner ();
+        spinner.halign = Gtk.Align.CENTER;
+        spinner.valign = Gtk.Align.CENTER;
+        spinner.start ();
+
+        loading_container.pack_start (spinner, true, true);
+
+        return loading_container;
     }
 
     private void create_bindings () {
@@ -141,11 +171,15 @@ public class Viewer.Widgets.CameraPage : Gtk.Overlay {
             Idle.add (() => {
                 frame_view.set_from_pixbuf (scaled_frame);
 
+                loading_revealer.set_reveal_child (false);
+
                 return false;
             });
         } else {
             Idle.add (() => {
                 frame_view.set_from_pixbuf (frame);
+
+                loading_revealer.set_reveal_child (false);
 
                 return false;
             });

@@ -223,6 +223,8 @@ public class Viewer.MainWindow : Gtk.Window {
             } else {
                 stop_camera_stream ();
             }
+
+            camera_page.reset ();
         });
 
         side_bar_toggle.clicked.connect (() => {
