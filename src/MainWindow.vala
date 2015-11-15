@@ -147,17 +147,19 @@ public class Viewer.MainWindow : Gtk.Window {
         });
 
         this.key_press_event.connect ((event) => {
-            /* Tastendrücke im Steuerungsfenster ignorieren */
+            /* Vollbild-Funktion ist immer Verfügbar */
+            if (event.keyval == Gdk.Key.F11) {
+                toggle_fullscreen ();
+
+                return Gdk.EVENT_STOP;
+            }
+
+            /* Steuerungstasten auf Konfigurationsseite ignorieren */
             if (stack.visible_child_name == "configuration") {
                 return Gdk.EVENT_PROPAGATE;
             }
 
             switch (event.keyval) {
-                case Gdk.Key.F11:
-                    toggle_fullscreen ();
-
-                    break;
-
                 case Gdk.Key.Up: key_up_pressed = true; break;
                 case Gdk.Key.Down: key_down_pressed = true; break;
                 case Gdk.Key.Left: key_left_pressed = true; break;
@@ -175,7 +177,7 @@ public class Viewer.MainWindow : Gtk.Window {
         });
 
         this.key_release_event.connect ((event) => {
-            /* Tastendrücke im Steuerungsfenster ignorieren */
+            /* Steuerungstasten auf Konfigurationsseite ignorieren */
             if (stack.visible_child_name == "configuration") {
                 return Gdk.EVENT_PROPAGATE;
             }
