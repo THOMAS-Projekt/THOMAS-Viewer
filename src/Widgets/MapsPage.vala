@@ -46,6 +46,16 @@ public class Viewer.Widgets.MapsPage : Gtk.Stack {
     }
 
     private void connect_signals () {
+        bus_manager.distance_map_registered.connect ((map_id) => {
+            MapTab map_tab = new MapTab (map_id, "Karte %i".printf (map_id));
+            map_tab.working = true;
+
+            maps.@set (map_id, map_tab);
+            notebook.insert_tab (map_tab, -1);
+
+            this.set_visible_child_name ("notebook");
+        });
+
         bus_manager.map_scan_continued.connect ((map_id, angle, distances) => {
             if (!maps.has_key (map_id)) {
                 return;
@@ -82,20 +92,6 @@ public class Viewer.Widgets.MapsPage : Gtk.Stack {
     }
 
     private void start_new_scan () {
-        bus_manager.start_new_scan.begin ((obj, res) => {
-            int map_id = bus_manager.start_new_scan.end (res);
-
-            if (map_id < 0) {
-                return;
-            }
-
-            MapTab map_tab = new MapTab (map_id, "Karte %i".printf (map_id));
-            map_tab.working = true;
-
-            maps.@set (map_id, map_tab);
-            notebook.insert_tab (map_tab, -1);
-
-            this.set_visible_child_name ("notebook");
-        });
+        bus_manager.start_new_scan.begin ();
     }
 }

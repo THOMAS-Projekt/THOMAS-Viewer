@@ -33,6 +33,9 @@ public class Viewer.Backend.BusManager : Object {
     public signal void action_failure (string message);
     public signal void action_success ();
 
+    public signal void camera_stream_registered (int streamer_id);
+    public signal void distance_map_registered (int map_id);
+
     public signal void cpu_load_changed (double cpu_load);
     public signal void memory_usage_changed (double memory_usage);
     public signal void net_load_changed (uint64 bytes_in, uint64 bytes_out);
@@ -363,6 +366,20 @@ public class Viewer.Backend.BusManager : Object {
                                                               DBusConnectionFlags.AUTHENTICATION_CLIENT);
 
             connection.signal_subscribe (null, SERVER_NAME,
+                                         "CameraStreamRegistered",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_camera_stream_registered);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "DistanceMapRegistered",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_distance_map_registered);
+
+            connection.signal_subscribe (null, SERVER_NAME,
                                          "CpuLoadChanged",
                                          SERVER_PATH,
                                          null,
@@ -414,6 +431,24 @@ public class Viewer.Backend.BusManager : Object {
 
         /* Nur um nochmals sicherzugehen */
         return (connection != null && !connection.closed);
+    }
+
+    private void on_camera_stream_registered (DBusConnection connection,
+                                              string ? sender_name,
+                                              string object_path,
+                                              string interface_name,
+                                              string signal_name,
+                                              Variant paramerers) {
+        camera_stream_registered (paramerers.get_child_value (0).get_int32 ());
+    }
+
+    private void on_distance_map_registered (DBusConnection connection,
+                                             string ? sender_name,
+                                             string object_path,
+                                             string interface_name,
+                                             string signal_name,
+                                             Variant paramerers) {
+        distance_map_registered (paramerers.get_child_value (0).get_int32 ());
     }
 
     private void on_cpu_load_changed (DBusConnection connection,

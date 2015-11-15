@@ -140,7 +140,6 @@ public class Viewer.Widgets.CameraPage : Gtk.Overlay {
 
             Idle.add (() => {
                 frame_view.set_from_pixbuf (scaled_frame);
-                debug ("update");
 
                 return false;
             });
