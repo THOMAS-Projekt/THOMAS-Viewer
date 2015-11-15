@@ -155,7 +155,6 @@ public class Viewer.Backend.JoystickManager : Object {
             speed_right = -(int)(JOYSTICK_SPEED_CONVERSION_FACTOR * axis_rotation_value);
         }
 
-	debug("%i %i -> %i : %i", axis_north_south_value, axis_west_east_value, speed_left, speed_right);	
         /* Geschwindigkeiten senden */
         bus_manager.accelerate_to_motor_speed (BusManager.Motor.LEFT, speed_left);
         bus_manager.accelerate_to_motor_speed (BusManager.Motor.RIGHT, speed_right);
