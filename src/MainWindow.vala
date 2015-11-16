@@ -79,7 +79,8 @@ public class Viewer.MainWindow : Gtk.Window {
     }
 
     private void build_ui () {
-        this.set_default_size (1000, 700);
+        this.set_size_request (1000, 600);
+        this.set_default_size (1200, 800);
         this.events |= Gdk.EventMask.KEY_PRESS_MASK |
                        Gdk.EventMask.KEY_RELEASE_MASK;
 

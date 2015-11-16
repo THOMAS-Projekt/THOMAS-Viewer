@@ -36,6 +36,8 @@ public class Viewer.Backend.BusManager : Object {
     public signal void camera_stream_registered (int streamer_id);
     public signal void distance_map_registered (int map_id);
 
+    public signal void wifi_ssid_changed (string ssid);
+    public signal void wifi_signal_strength_changed (uint8 signal_strength);
     public signal void cpu_load_changed (double cpu_load);
     public signal void memory_usage_changed (double memory_usage);
     public signal void net_load_changed (uint64 bytes_in, uint64 bytes_out);
@@ -354,6 +356,32 @@ public class Viewer.Backend.BusManager : Object {
         });
     }
 
+    private void force_telemetry_update () {
+        if (!validate_connection ()) {
+            return;
+        }
+
+        connection.call.begin (null,
+                               SERVER_PATH,
+                               SERVER_NAME,
+                               "ForceTelemetryUpdate",
+                               null,
+                               VariantType.TUPLE,
+                               DBusCallFlags.NONE,
+                               CALL_TIMEOUT,
+                               null, (obj, res) => {
+            try {
+                if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
+                    action_failure ("Eine Aktualisierung der Telemtetriedaten konnte nicht angefordert werden.");
+                } else {
+                    action_success ();
+                }
+            } catch (Error e) {
+                connection_failure (e.message);
+            }
+        });
+    }
+
     private bool validate_connection () {
         if (connection != null && !connection.closed) {
             return true;
@@ -378,6 +406,20 @@ public class Viewer.Backend.BusManager : Object {
                                          null,
                                          DBusSignalFlags.NONE,
                                          on_distance_map_registered);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "WifiSsidChanged",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_wifi_ssid_changed);
+
+            connection.signal_subscribe (null, SERVER_NAME,
+                                         "WifiSignalStrengthChanged",
+                                         SERVER_PATH,
+                                         null,
+                                         DBusSignalFlags.NONE,
+                                         on_wifi_signal_strength_changed);
 
             connection.signal_subscribe (null, SERVER_NAME,
                                          "CpuLoadChanged",
@@ -420,6 +462,9 @@ public class Viewer.Backend.BusManager : Object {
                                          null,
                                          DBusSignalFlags.NONE,
                                          on_map_scan_finished);
+
+            /* Verbindungsabhängige Informationan anfordern */
+            force_telemetry_update ();
         } catch (Error e) {
             warning ("Herstellen der DBus-Verbindung fehlgeschlagen: %s", e.message);
             connection_failure (e.message);
@@ -449,6 +494,24 @@ public class Viewer.Backend.BusManager : Object {
                                              string signal_name,
                                              Variant paramerers) {
         distance_map_registered (paramerers.get_child_value (0).get_int32 ());
+    }
+
+    private void on_wifi_ssid_changed (DBusConnection connection,
+                                       string ? sender_name,
+                                       string object_path,
+                                       string interface_name,
+                                       string signal_name,
+                                       Variant paramerers) {
+        wifi_ssid_changed (paramerers.get_child_value (0).get_string ());
+    }
+
+    private void on_wifi_signal_strength_changed (DBusConnection connection,
+                                                  string ? sender_name,
+                                                  string object_path,
+                                                  string interface_name,
+                                                  string signal_name,
+                                                  Variant paramerers) {
+        wifi_signal_strength_changed (paramerers.get_child_value (0).get_byte ());
     }
 
     private void on_cpu_load_changed (DBusConnection connection,
