@@ -189,6 +189,37 @@ public class Viewer.Backend.BusManager : Object {
         });
     }
 
+    public void set_relay (int port, bool state) {
+        if (!validate_connection ()) {
+            return;
+        }
+
+        Variant[] parameters = {
+            new Variant.int32 (port),
+            new Variant.boolean (state)
+        };
+
+        connection.call.begin (null,
+                               SERVER_PATH,
+                               SERVER_NAME,
+                               "SetRelay",
+                               new Variant.tuple (parameters),
+                               VariantType.TUPLE,
+                               DBusCallFlags.NONE,
+                               CALL_TIMEOUT,
+                               null, (obj, res) => {
+            try {
+                if (!connection.call.end (res).get_child_value (0).get_boolean ()) {
+                    action_failure ("Ein Zugriff auf die Relaykarte wird nicht unterstützt.");
+                } else {
+                    action_success ();
+                }
+            } catch (Error e) {
+                connection_failure (e.message);
+            }
+        });
+    }
+
     public async int start_camera_stream (string viewer_host, uint16 viewer_port) {
         if (!validate_connection ()) {
             return -1;

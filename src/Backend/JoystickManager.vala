@@ -104,13 +104,19 @@ public class Viewer.Backend.JoystickManager : Object {
     }
 
     private void process_button_change (uint8 button_hash, bool button_state) {
-        debug ("%d -> %s", button_hash, button_state.to_string ());
+        switch (button_hash) {
+            case Joystick.Button.SIDEWINDER_BUTTON_FIRE :
+            case Joystick.Button.XBOX_BUTTON_A :
+                bus_manager.set_relay (1, button_state);
+
+                break;
+        }
     }
 
     private void process_axis_change (uint8 axis_hash, int axis_value) {
         switch (axis_hash) {
-            case Joystick.Axis.SIDEWINDER_AXIS_NORTH_SOUTH :
-            case Joystick.Axis.XBOX_AXIS_TOP_NORTH_SOUTH :
+            case Joystick.Axis.SIDEWINDER_AXIS_NORTH_SOUTH:
+            case Joystick.Axis.XBOX_AXIS_TOP_NORTH_SOUTH:
                 axis_north_south_value = axis_value;
 
                 break;

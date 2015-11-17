@@ -160,6 +160,11 @@ public class Viewer.MainWindow : Gtk.Window {
                 return Gdk.EVENT_PROPAGATE;
             }
 
+            /* Falls die Taste ein Relay einschalten soll, weitere Verarbeitung abbrechen */
+            if (process_key_relay_control (event.keyval, true)) {
+                return Gdk.EVENT_STOP;
+            }
+
             switch (event.keyval) {
                 case Gdk.Key.Up: key_up_pressed = true; break;
                 case Gdk.Key.Down: key_down_pressed = true; break;
@@ -181,6 +186,11 @@ public class Viewer.MainWindow : Gtk.Window {
             /* Steuerungstasten auf Konfigurationsseite ignorieren */
             if (stack.visible_child_name == "configuration") {
                 return Gdk.EVENT_PROPAGATE;
+            }
+
+            /* Falls die Taste ein Relay ausschalten soll, weitere Verarbeitung abbrechen */
+            if (process_key_relay_control (event.keyval, false)) {
+                return Gdk.EVENT_STOP;
             }
 
             switch (event.keyval) {
@@ -251,6 +261,29 @@ public class Viewer.MainWindow : Gtk.Window {
         }
 
         is_fullscreened = !is_fullscreened;
+    }
+
+    private bool process_key_relay_control (uint keyval, bool state) {
+        int relay_port = 0;
+
+        switch (keyval) {
+            case Gdk.Key.@1: relay_port = 1; break;
+            case Gdk.Key.@2: relay_port = 2; break;
+            case Gdk.Key.@3: relay_port = 3; break;
+            case Gdk.Key.@4: relay_port = 4; break;
+            case Gdk.Key.@5: relay_port = 5; break;
+            case Gdk.Key.@6: relay_port = 6; break;
+            case Gdk.Key.@7: relay_port = 7; break;
+            case Gdk.Key.@8: relay_port = 8; break;
+
+            default:
+
+                return false;
+        }
+
+        bus_manager.set_relay (relay_port, state);
+
+        return true;
     }
 
     private void process_key_control () {
