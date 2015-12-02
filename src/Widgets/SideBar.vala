@@ -108,11 +108,11 @@ public class Viewer.Widgets.SideBar : Gtk.Grid {
         });
 
         bus_manager.cpu_load_changed.connect ((cpu_load) => {
-            cpu_load_field.set_text ("%f %%".printf (cpu_load));
+            cpu_load_field.set_text ("%.1f %%".printf (cpu_load));
         });
 
         bus_manager.memory_usage_changed.connect ((memory_usage) => {
-            memory_usage_field.set_text ("%f MB".printf (memory_usage));
+            memory_usage_field.set_text ("%.1f MB".printf (memory_usage));
         });
 
         bus_manager.net_load_changed.connect ((bytes_in, bytes_out) => {
