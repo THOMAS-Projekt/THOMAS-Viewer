@@ -26,6 +26,7 @@ public class Viewer.MainWindow : Gtk.Window {
     private Backend.BusManager bus_manager;
     private Backend.UDPRenderer udp_renderer;
     private Backend.JoystickManager joystick_manager;
+    private Backend.ServiceBrowser service_browser;
 
     private Gtk.HeaderBar header_bar;
 
@@ -67,6 +68,7 @@ public class Viewer.MainWindow : Gtk.Window {
         bus_manager = new Backend.BusManager (settings_manager);
         udp_renderer = new Backend.UDPRenderer (CAMERA_STREAMER_PORT);
         joystick_manager = new Backend.JoystickManager (bus_manager);
+        service_browser = new Backend.ServiceBrowser ();
 
         configure_gtk ();
         build_ui ();
@@ -225,6 +227,8 @@ public class Viewer.MainWindow : Gtk.Window {
         bus_manager.action_success.connect (() => {
             info_bar.hide ();
         });
+
+        service_browser.thomas_discovered.connect (configuration_page.set_address);
 
         info_bar.response.connect (() => {
             info_bar.hide ();

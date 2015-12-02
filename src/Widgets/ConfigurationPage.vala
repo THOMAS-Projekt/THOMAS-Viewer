@@ -36,6 +36,11 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
         connect_signals ();
     }
 
+    public void set_address (string hostname, uint port) {
+        /* TODO: Evtl. Port berücksichtigen. */
+        host_entry.set_text (hostname);
+    }
+
     private void build_ui () {
         this.margin = 24;
         this.column_spacing = 24;

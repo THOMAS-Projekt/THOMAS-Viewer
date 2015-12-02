@@ -14,12 +14,15 @@ vala_precompile (VALA_C
     Backend/UDPRenderer.vala
     Backend/Joystick.vala
     Backend/JoystickManager.vala
+    Backend/ServiceBrowser.vala
 PACKAGES
     gtk+-3.0
     gio-2.0
     granite
     posix
     linux-joystick
+    avahi-gobject
+    avahi-client
 OPTIONS
     --vapidir=${CMAKE_SOURCE_DIR}/vapi/
     --thread
