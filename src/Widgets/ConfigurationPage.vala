@@ -26,6 +26,8 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
     private Gtk.Entry own_host_entry;
     private Gtk.ComboBoxText joystick_selection;
 
+    private string detected_address = "";
+
     private int rows = 0;
 
     public ConfigurationPage (Backend.SettingsManager settings_manager, Backend.BusManager bus_manager, Backend.JoystickManager joystick_manager) {
@@ -38,7 +40,7 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
 
     public void set_address (string hostname, uint port) {
         /* TODO: Evtl. Port berücksichtigen. */
-        host_entry.set_text (hostname);
+        detected_address = hostname;
     }
 
     private void build_ui () {
@@ -50,6 +52,7 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
 
         host_entry = new Gtk.Entry ();
         host_entry.text = settings_manager.last_host;
+        host_entry.secondary_icon_name = "edit-find-symbolic";
 
         own_host_entry = new Gtk.Entry ();
         own_host_entry.text = settings_manager.own_host;
@@ -91,6 +94,12 @@ public class Viewer.Widgets.ConfigurationPage : Gtk.Grid {
             settings_manager.last_host = host_entry.text;
 
             bus_manager.invalidate_connection ();
+        });
+
+        host_entry.icon_press.connect ((icon) => {
+            if (icon == Gtk.EntryIconPosition.SECONDARY && detected_address != "") {
+                host_entry.set_text (detected_address);
+            }
         });
 
         own_host_entry.changed.connect (() => {
