@@ -18,6 +18,10 @@
  */
 
 public class Viewer.Widgets.MapTab : Granite.Widgets.Tab {
+    private static const int SENSOR_ANGLE_OFFSET = -15;
+    private static const int CONNECT_DISTANCES_MIN_RADIUS = 50;
+    private static const int CONNECT_DISTANCES_MAX_RADIUS = 200;
+
     public int map_id { get; construct set; }
     public string map_name { get; construct set; }
 
@@ -60,59 +64,47 @@ public class Viewer.Widgets.MapTab : Granite.Widgets.Tab {
     }
 
     private bool on_draw (Cairo.Context context) {
-        int angle_before = 0;
-        double last_avg_sum = 0;
-
         int height = drawing_area.get_allocated_height ();
         int width = drawing_area.get_allocated_width ();
 
         double thomas_x = width * 0.5;
         double thomas_y = height * 0.8;
-        debug (thomas_x.to_string () + " - " + thomas_y.to_string ());
+
+        double last_near_distance_x = 0;
+        double last_near_distance_y = 0;
 
         /* THOMAS zeichnen */
         draw_circle (context, thomas_x, thomas_y, 5, { 0, 0, 0, 255 });
 
         /* Messwerte zeichnen */
         distances.@foreach ((entry) => {
-            int angle = entry.key - 15;
+            int angle = entry.key + SENSOR_ANGLE_OFFSET;
             Gee.ArrayList<uint16> distances = entry.@value;
 
             double avg_sum = calculate_avg_sum (0, 10, distances);
 
-            double avg_difference = calculate_avg_difference (0, 10, avg_sum, distances);
+            double distance_x = thomas_x - (Math.cos (to_radians (angle)) * avg_sum);
+            double distance_y = thomas_y - (Math.sin (to_radians (angle)) * avg_sum);
 
-            if (avg_difference < 1.5) {
-                double distance_x_position = thomas_x - (Math.cos (to_radians (angle)) * avg_sum);
-                double distance_y_position = thomas_y - (Math.sin (to_radians (angle)) * avg_sum);
+            draw_circle (context,
+                         distance_x,
+                         distance_y,
+                         2,
+                         { 255, 255, 255, 255 });
 
-                double distance_x_before = thomas_x - (Math.cos (to_radians (angle_before)) * avg_sum);
-                double distance_y_before = thomas_y - (Math.sin (to_radians (angle_before)) * avg_sum);
-
-                double distance_beetween_points = calculate_distance (distance_x_position, distance_x_before, distance_y_position, distance_y_before);
-
-                if (distance_beetween_points > 40) {
-
-                    double real_distance_x = thomas_x - (Math.cos (to_radians (angle_before)) * last_avg_sum);
-                    double real_distance_y = thomas_y - (Math.sin (to_radians (angle_before)) * last_avg_sum);
-
-                    context.set_line_width (3);
-                    context.set_source_rgba (1, 0.2, 0.2, 0.6);
-                    context.move_to (distance_x_position, distance_y_position);
-                    context.line_to (real_distance_x, real_distance_y);
-                    context.stroke();
-
-                    debug("FROM %f, %f TO: %f,%f", distance_x_position, distance_y_position, distance_x_before, distance_y_before);
+            if (avg_sum >= CONNECT_DISTANCES_MIN_RADIUS && avg_sum <= CONNECT_DISTANCES_MAX_RADIUS) {
+                if (last_near_distance_x > 0 && last_near_distance_y > 0) {
+                    draw_line (context,
+                               last_near_distance_x,
+                               last_near_distance_y,
+                               distance_x,
+                               distance_y,
+                               1,
+                               { 255, 255, 255, 255 });
                 }
 
-                draw_circle (context,
-                             distance_x_position,
-                             distance_y_position,
-                             1,
-                             { 0, 255, 0, 255 });
-
-                angle_before = angle;
-                last_avg_sum = avg_sum;
+                last_near_distance_x = distance_x;
+                last_near_distance_y = distance_y;
             }
 
             return true;
@@ -122,10 +114,19 @@ public class Viewer.Widgets.MapTab : Granite.Widgets.Tab {
     }
 
     private void draw_circle (Cairo.Context context, double pos_x, double pos_y, int radius, Gdk.RGBA color) {
-        context.arc (pos_x, pos_y, radius, 0, 2 * Math.PI);
-
         Gdk.cairo_set_source_rgba (context, color);
+
+        context.arc (pos_x, pos_y, radius, 0, 2 * Math.PI);
         context.fill ();
+    }
+
+    private void draw_line (Cairo.Context context, double pos1_x, double pos1_y, double pos2_x, double pos2_y, int width, Gdk.RGBA color) {
+        Gdk.cairo_set_source_rgba (context, color);
+
+        context.set_line_width (width);
+        context.move_to (pos1_x, pos1_y);
+        context.line_to (pos2_x, pos2_y);
+        context.stroke ();
     }
 
     private double to_radians (int degree) {
@@ -135,25 +136,10 @@ public class Viewer.Widgets.MapTab : Granite.Widgets.Tab {
     private double calculate_avg_sum (int start, int end, Gee.ArrayList<uint16> distances) {
         double sum = 0;
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = start; i < end; i++) {
             sum += distances.@get (i);
         }
 
         return sum / (end - start);
-    }
-
-    private double calculate_avg_difference (int start, int end, double avg_sum, Gee.ArrayList<uint16> distances) {
-        double avg_calc = 0;
-
-        for (int i = 0; i < 10; i++) {
-            avg_calc += Math.fabs ((distances.@get (i) - avg_sum));
-        }
-
-        return (avg_calc / avg_sum);
-    }
-
-    private double calculate_distance (double x1, double x2, double y1, double y2) {
-        /* Distanz zwischen zwei Punkten berechnen und Wurzel ziehen ignorieren, um Leistung zu sparen */
-        return Math.sqrt ((Math.pow (x2 - x1, 2) + (Math.pow (y2 - y1, 2))));
     }
 }
